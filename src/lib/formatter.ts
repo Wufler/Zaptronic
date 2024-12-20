@@ -14,7 +14,7 @@ export function formatNumber(number: number) {
     return NUMBER_FORMATTER.format(number)
 }
 
-export function discountPercentage(product: any): number {
+export function discountPercentage(product: Products): number {
     return product?.sale_price ? Math.round(
         ((Number(product?.price) - Number(product?.sale_price)) /
             Number(product?.price)) *

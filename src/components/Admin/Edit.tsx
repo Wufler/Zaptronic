@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { formatCurrency } from '@/lib/formatter'
 import { Switch } from '@/components/ui/switch'
@@ -43,7 +42,7 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from '@/components/ui/accordion'
-import { Link } from 'next-view-transitions'
+import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -76,7 +75,7 @@ import {
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { deleteProduct, editProduct } from '../actions/products/editProduct'
+import { deleteProduct, editProduct } from '@/actions/products/editProduct'
 import NotFound from '@/app/not-found'
 import {
 	AlertDialog,
@@ -208,15 +207,9 @@ export default function Edit({
 			...data,
 			images: data.images.map((url: string) => ({ url })),
 		}
-		const editedProduct = await editProduct(
-			productData,
-			product.id,
-			product.images[0].id
-		)
+		await editProduct(productData, product.id, product.images[0].id)
 		router.push(`/products/${product.id}`)
-		toast.success('Product edited successfully', {
-			position: 'bottom-center',
-		})
+		toast.success('Product edited successfully')
 	}
 	if (!product) {
 		return (
@@ -227,9 +220,7 @@ export default function Edit({
 	async function handleDelete(id: number) {
 		deleteProduct(id)
 		router.push(`/products`)
-		toast.success('Product deleted successfully', {
-			position: 'bottom-center',
-		})
+		toast.success('Product deleted successfully')
 	}
 
 	return (

@@ -1,9 +1,7 @@
 'use client'
-
 import { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { formatCurrency } from '@/lib/formatter'
 import { Switch } from '@/components/ui/switch'
@@ -20,7 +18,6 @@ import {
 	X,
 	Check,
 	ChevronsUpDown,
-	User,
 } from 'lucide-react'
 import {
 	Carousel,
@@ -44,7 +41,7 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from '@/components/ui/accordion'
-import { Link } from 'next-view-transitions'
+import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -74,7 +71,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from '@/components/ui/popover'
-import { createProduct } from '../actions/products/createProduct'
+import { createProduct } from '@/actions/products/createProduct'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -190,11 +187,9 @@ export default function Create({ categories }: { categories: any[] }) {
 			images: data.images.map((url: string) => ({ url, alt: data.slug })),
 		}
 
-		const createdProduct = await createProduct(productData)
+		await createProduct(productData)
 		router.push('/products')
-		toast.success('Product created successfully', {
-			position: 'bottom-center',
-		})
+		toast.success('Product created successfully')
 	}
 
 	return (

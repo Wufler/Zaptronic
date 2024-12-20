@@ -1,7 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import {
 	Accordion,
 	AccordionContent,
@@ -9,9 +8,8 @@ import {
 	AccordionTrigger,
 } from '@/components/ui/accordion'
 import { formatCurrency } from '@/lib/formatter'
-import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
-import { Link } from 'next-view-transitions'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, Heart, CircleCheck, CircleX } from 'lucide-react'
 import {
@@ -25,7 +23,7 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { deleteWish } from '../actions/wishlist/Wishlist'
+import { deleteWish } from '@/actions/wishlist/Wishlist'
 
 interface WishlistItem {
 	id: number

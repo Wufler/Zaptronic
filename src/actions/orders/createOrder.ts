@@ -2,7 +2,7 @@
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 
-export async function addOrder(id: string, cartItems: any[], amount: number) {
+export async function addOrder(id: string, cartItems: { id: number }[], amount: number) {
     await prisma.orders.create({
         data: {
             userId: id,

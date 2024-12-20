@@ -1,4 +1,4 @@
-export interface Products {
+type Products = {
 	id: number
 	name: string
 	slug: string
@@ -8,11 +8,7 @@ export interface Products {
 		name: string
 		slug: string
 	}[]
-	categories: {
-		id: number
-		name: string
-		slug: string
-	}[]
+	categories: Category[]
 	specifications: {
 		id: number
 		info: string[]
@@ -51,11 +47,8 @@ export interface Products {
 	updatedAt: Date
 }
 
-declare module "next-auth" {
-	interface Session {
-		user: {
-			id: string
-			role: string
-		} & DefaultSession["user"]
-	}
+type Category = {
+	id: number
+	name: string
+	slug: string
 }

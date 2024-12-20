@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -18,9 +17,9 @@ import {
 import Loading from '@/components/Loading'
 import { ShoppingBag, Trash2 } from 'lucide-react'
 import { formatCurrency, convertToSubcurrency } from '@/lib/formatter'
-import { fetchProduct } from '../actions/products/productsData'
+import { fetchProducts } from '@/actions/products/productsData'
 import { CheckoutForm } from './Checkout'
-import { Link } from 'next-view-transitions'
+import Link from 'next/link'
 
 if (process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY === undefined) {
 	throw new Error('NEXT_PUBLIC_STRIPE_PUBLIC_KEY is not defined')
@@ -42,7 +41,9 @@ export default function CheckoutPage({ user }: { user: any }) {
 				const parsedCart = JSON.parse(storedCart)
 				setCartItems(parsedCart)
 
-				const productPromises = parsedCart.map((item: any) => fetchProduct(item.id))
+				const productPromises = parsedCart.map((item: any) =>
+					fetchProducts(false, item.id)
+				)
 				const products = await Promise.all(productPromises)
 				const productsWithQuantity = products.map((product, index) => ({
 					...product,
@@ -92,9 +93,7 @@ export default function CheckoutPage({ user }: { user: any }) {
 				setClientSecret(data.clientSecret)
 			} catch (error) {
 				console.error('Error fetching client secret:', error)
-				toast.error('Failed to initialize payment. Please try again.', {
-					position: 'bottom-center',
-				})
+				toast.error('Failed to initialize payment. Please try again.')
 			}
 		}
 

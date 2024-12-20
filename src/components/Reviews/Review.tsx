@@ -12,7 +12,7 @@ import {
 	CardTitle,
 } from '@/components/ui/card'
 import NotFound from '@/app/not-found'
-import { Link } from 'next-view-transitions'
+import Link from 'next/link'
 import { toast } from 'sonner'
 import {
 	Form,
@@ -27,8 +27,8 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { createReview } from '../actions/reviews/createReview'
-import { calculateAverage } from '../actions/averageRating'
+import { createReview } from '@/actions/reviews/createReview'
+import { calculateAverage } from '@/actions/averageRating'
 import { discountPercentage, formatCurrency } from '@/lib/formatter'
 import { Badge } from '../ui/badge'
 
@@ -68,14 +68,11 @@ export default function Review({ product, user }: { product: any; user: any }) {
 				<div className="flex items-center gap-2">
 					<CheckCircle2 className="size-5" />
 					<span>Product successfully reviewed.</span>
-				</div>,
-				{ position: 'bottom-center' }
+				</div>
 			)
 			router.push(`/products/${product.id}`)
 		} catch (error) {
-			toast.error(`Failed to submit review. Please try again.: ${error}`, {
-				position: 'bottom-center',
-			})
+			toast.error(`Failed to submit review. Please try again.: ${error}`)
 		}
 	}
 

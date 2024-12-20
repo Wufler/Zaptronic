@@ -10,19 +10,10 @@ export async function fetchOrders(id: string) {
         orderBy: {
             createdAt: 'desc',
         },
-        select: {
-            orderId: true,
-            price_paid: true,
-            payment_method: true,
-            order_status: true,
-            createdAt: true,
-            updatedAt: true,
+        include: {
             products: {
-                select: {
-                    id: true,
-                    name: true,
-                    images: true,
-                    reviews: true,
+                include: {
+                    images: true
                 }
             }
         },

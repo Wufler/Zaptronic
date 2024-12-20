@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Loading from '@/components/Loading'
 import { formatCurrency } from '@/lib/formatter'
-import { addOrder } from '../actions/orders/createOrder'
+import { addOrder } from '@/actions/orders/createOrder'
 
 export function CheckoutForm({
 	amount,
@@ -25,7 +25,7 @@ export function CheckoutForm({
 }) {
 	const stripe = useStripe()
 	const elements = useElements()
-	const [errorMessage, setErrorMessage] = useState<string>()
+	const [errorMessage] = useState<string>()
 	const [loading, setLoading] = useState(false)
 	const router = useRouter()
 
@@ -59,9 +59,7 @@ export function CheckoutForm({
 				if (session?.user?.id) {
 					await addOrder(session.user.id, cartItems, amount)
 					localStorage.removeItem('cart')
-					toast.success('Payment successful and order placed!', {
-						position: 'bottom-center',
-					})
+					toast.success('Payment successful and order placed!')
 					window.dispatchEvent(new Event('cartUpdated'))
 					router.push('/payment-success')
 				} else {
@@ -72,9 +70,7 @@ export function CheckoutForm({
 			}
 		} catch (error: any) {
 			console.error('Payment error:', error)
-			toast.error(error.message || 'Payment failed. Please try again.', {
-				position: 'bottom-center',
-			})
+			toast.error(error.message || 'Payment failed. Please try again.')
 		} finally {
 			setLoading(false)
 		}

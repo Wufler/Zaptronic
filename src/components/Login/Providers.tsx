@@ -1,22 +1,22 @@
 'use client'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import Loading from '@/components/Loading'
-
+import { authClient } from '@/lib/auth-client'
+import { useRouter } from 'next/navigation'
 export default function Providers() {
 	const [isLoading, setIsLoading] = useState(false)
+	const router = useRouter()
 
 	const handleGitHub = async () => {
 		setIsLoading(true)
 		try {
-			await signIn('github', { callbackUrl: '/' })
+			await authClient.signIn.social({ provider: 'github', callbackURL: '/' })
+			router.refresh()
 		} catch (error) {
-			toast.error(`GitHub sign-in failed: ${error}`, {
-				position: 'bottom-center',
-			})
+			toast.error(`GitHub sign-in failed: ${error}`)
 		} finally {
 			setIsLoading(false)
 		}
@@ -25,11 +25,9 @@ export default function Providers() {
 	const handleDiscord = async () => {
 		setIsLoading(true)
 		try {
-			await signIn('discord', { callbackUrl: '/' })
+			await authClient.signIn.social({ provider: 'discord', callbackURL: '/' })
 		} catch (error) {
-			toast.error(`Discord sign-in failed: ${error}`, {
-				position: 'bottom-center',
-			})
+			toast.error(`Discord sign-in failed: ${error}`)
 		} finally {
 			setIsLoading(false)
 		}

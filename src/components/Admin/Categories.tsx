@@ -1,5 +1,4 @@
 'use client'
-
 import { z } from 'zod'
 import { Input } from '@/components/ui/input'
 import {
@@ -30,7 +29,7 @@ import {
 	createCategory,
 	deleteCategory,
 	editCategory,
-} from '../actions/products/categories'
+} from '@/actions/products/categories'
 import { Minus, Plus, Trash2 } from 'lucide-react'
 import Loading from '../Loading'
 
@@ -85,14 +84,10 @@ export default function Categories({
 					await editCategory({ ...category, id: categoryId })
 				})
 			)
-			toast.success('Categories updated successfully', {
-				position: 'bottom-center',
-			})
+			toast.success('Categories updated successfully')
 			setCategories(data.categories)
 		} catch (error) {
-			toast.error(`Failed to update categories ${error}`, {
-				position: 'bottom-center',
-			})
+			toast.error(`Failed to update categories ${error}`)
 		}
 		setIsLoading(false)
 	}
@@ -100,15 +95,11 @@ export default function Categories({
 	async function onDelete(id: number) {
 		try {
 			await deleteCategory(id)
-			toast.success('Category deleted successfully', {
-				position: 'bottom-center',
-			})
+			toast.success('Category deleted successfully')
 			const updatedCategories = categories.filter(cat => cat.id !== id)
 			setCategories(updatedCategories)
 		} catch (error) {
-			toast.error(`Failed to delete category ${error}`, {
-				position: 'bottom-center',
-			})
+			toast.error(`Failed to delete category ${error}`)
 		}
 	}
 
@@ -116,16 +107,12 @@ export default function Categories({
 		setIsLoading(true)
 		try {
 			const newCategory = await createCategory(data)
-			toast.success('Category created successfully', {
-				position: 'bottom-center',
-			})
+			toast.success('Category created successfully')
 			setCategories(prevCategories => [...prevCategories, newCategory])
 			setShowNewCategoryForm(false)
 			newCategoryForm.reset()
 		} catch (error) {
-			toast.error(`Failed to create category ${error}`, {
-				position: 'bottom-center',
-			})
+			toast.error(`Failed to create category ${error}`)
 		}
 		setIsLoading(false)
 	}

@@ -1,19 +1,12 @@
 'use client'
-import { calculateAverage } from '../actions/averageRating'
+import { calculateAverage } from '@/actions/averageRating'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { discountPercentage, formatCurrency } from '@/lib/formatter'
 import { format } from 'date-fns'
 import { CircleCheck, CircleX, Star, User } from 'lucide-react'
-import { Link } from 'next-view-transitions'
+import Link from 'next/link'
 import Image from 'next/image'
 
 export default function Reviews({ product }: any) {

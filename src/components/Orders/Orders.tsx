@@ -10,8 +10,8 @@ import {
 import { formatCurrency } from '@/lib/formatter'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
-import { format } from 'date-fns'
-import { Link } from 'next-view-transitions'
+import { format, formatISO } from 'date-fns'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, Package } from 'lucide-react'
 import {
@@ -25,9 +25,9 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { cancelOrder } from '../actions/orders/ordersData'
+import { cancelOrder } from '@/actions/orders/ordersData'
 
-export default function Orders({ user }: { user: any }) {
+export default function Orders({ orders }: { orders: any }) {
 	async function handleCancel(id: number) {
 		await cancelOrder(id)
 	}
@@ -50,7 +50,7 @@ export default function Orders({ user }: { user: any }) {
 					</p>
 				</div>
 
-				{user.length === 0 ? (
+				{orders.length === 0 ? (
 					<Card className="text-center p-6">
 						<p className="text-lg text-gray-600 dark:text-gray-400 mb-4">
 							You currently have no orders.
@@ -60,7 +60,7 @@ export default function Orders({ user }: { user: any }) {
 						</Button>
 					</Card>
 				) : (
-					user.map((order: any) => (
+					orders.map((order: any) => (
 						<Card key={order.orderId} className="mb-4 shadow-lg">
 							<CardHeader className="bg-gray-100 dark:bg-gray-900 py-4">
 								<div className="flex items-center justify-between">
@@ -78,8 +78,8 @@ export default function Orders({ user }: { user: any }) {
 								</div>
 								<time
 									className="text-xs text-gray-500 dark:text-gray-400"
-									title={new Date(order.createdAt).toLocaleString()}
-									dateTime={new Date(order.createdAt).toISOString()}
+									title={format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}
+									dateTime={formatISO(new Date(order.createdAt))}
 								>
 									{format(new Date(order.createdAt), 'MMMM dd, yyyy')}
 								</time>
@@ -112,13 +112,19 @@ export default function Orders({ user }: { user: any }) {
 															href={`/products/${product.id}`}
 															className="flex-shrink-0 self-center"
 														>
-															<Image
-																className="size-32 rounded-md object-cover"
-																src={product.images[0].src[0]}
-																alt={product.images[0].alt}
-																width={128}
-																height={128}
-															/>
+															<div className="size-32 rounded-md flex items-center justify-center">
+																{product.images?.[0] ? (
+																	<Image
+																		className="size-32 rounded-md object-cover"
+																		src={product.images[0].src[0]}
+																		alt={product.images[0].alt}
+																		width={128}
+																		height={128}
+																	/>
+																) : (
+																	<Package className="size-8 text-gray-400" />
+																)}
+															</div>
 														</Link>
 														<div className="flex-1 pt-4 sm:pt-0">
 															<p className="text-base font-semibold text-gray-900 dark:text-white">

@@ -1,16 +1,19 @@
-import { auth } from '@/auth'
+import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import NotFound from '../not-found'
-import { getOrders, getUserData } from '@/components/actions/admin/salesData'
+import { getOrders, getUserData } from '@/actions/admin/salesData'
 import Admin from '@/components/Admin/Admin'
-import { fetchCategories } from '@/components/actions/products/categories'
-import { fetchAdminProducts } from '@/components/actions/products/productsData'
+import { fetchCategories } from '@/actions/products/categories'
+import { fetchProducts } from '@/actions/products/productsData'
+import { headers } from 'next/headers'
 
 export default async function Component() {
 	const [salesData, userData] = await Promise.all([getOrders(), getUserData()])
 	const categories = await fetchCategories()
-	const products = await fetchAdminProducts()
-	const session = await auth()
+	const products = await fetchProducts(true)
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
 
 	if (!session) {
 		redirect('/login')

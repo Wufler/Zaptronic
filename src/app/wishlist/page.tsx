@@ -1,10 +1,13 @@
 import React from 'react'
 import Wishlist from '@/components/Wishlist/Wishlist'
-import { auth } from '@/auth'
-import { fetchWishlist } from '@/components/actions/wishlist/Wishlist'
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
+import { fetchWishlist } from '@/actions/wishlist/Wishlist'
 
 export default async function page() {
-	const session = await auth()
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
 	const wishes = await fetchWishlist(session?.user.id || '')
 
 	return (

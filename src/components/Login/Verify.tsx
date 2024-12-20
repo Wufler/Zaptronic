@@ -13,8 +13,7 @@ import {
 	CardTitle,
 } from '@/components/ui/card'
 import { Mail } from 'lucide-react'
-import resendLogin from '../actions/resendLogin'
-
+import { authClient } from '@/lib/auth-client'
 export default function Verify() {
 	const searchParams = useSearchParams()
 	const [email, setEmail] = useState('')
@@ -27,19 +26,21 @@ export default function Verify() {
 		}
 	}, [searchParams])
 
-	const handleResend = async (formData: FormData) => {
+	const handleEmail = async (formData: FormData) => {
 		try {
-			await resendLogin(formData)
-			toast.success('Magic Link resent successfully.', {
-				position: 'bottom-center',
+			const { error } = await authClient.signIn.magicLink({
+				email: formData.get('email') as string,
+				callbackURL: '/',
 			})
+			if (error) {
+				throw new Error(error.message)
+			}
+			toast.success('Magic Link resent successfully.')
 			setCooldown(true)
 			setTimeout(() => setCooldown(false), 15000)
 		} catch (error) {
 			console.error(error)
-			toast.error('Failed to resend Magic Link.', {
-				position: 'bottom-center',
-			})
+			toast.error('Failed to send Magic Link.')
 		}
 	}
 
@@ -63,7 +64,7 @@ export default function Verify() {
 				</p>
 			</CardContent>
 			<CardFooter>
-				<form action={handleResend} className="w-full space-y-4">
+				<form action={handleEmail} className="w-full space-y-4">
 					<Input
 						type="email"
 						name="email"

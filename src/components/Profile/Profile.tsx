@@ -11,7 +11,7 @@ import {
 	CardTitle,
 } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Link } from 'next-view-transitions'
+import Link from 'next/link'
 import {
 	CalendarDays,
 	CreditCard,

@@ -1,11 +1,14 @@
-import { auth } from '@/auth'
+import { auth } from '@/lib/auth'
 import Passkey from '@/components/Login/Passkey'
 import Providers from '@/components/Login/Providers'
-import Resend from '@/components/Login/Resend'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
+import Email from '@/components/Login/Email'
 
 export default async function LoginPage() {
-	const session = await auth()
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
 
 	if (session) {
 		redirect('/')
@@ -21,7 +24,7 @@ export default async function LoginPage() {
 					</p>
 				</div>
 				<div className="space-y-4">
-					<Resend />
+					<Email />
 					<Providers />
 					<Passkey />
 				</div>

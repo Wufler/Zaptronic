@@ -1,4 +1,4 @@
-import { Link } from 'next-view-transitions'
+import Link from 'next/link'
 import { Button } from '../ui/button'
 import { PackagePlus, Pencil, Star } from 'lucide-react'
 import {
@@ -9,7 +9,7 @@ import {
 	CardTitle,
 } from '@/components/ui/card'
 import { formatCurrency } from '@/lib/formatter'
-import { calculateAverage } from '../actions/averageRating'
+import { calculateAverage } from '@/actions/averageRating'
 
 export default function Products({ products }: any) {
 	return (

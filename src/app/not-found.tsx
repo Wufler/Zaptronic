@@ -1,4 +1,3 @@
-import { Link } from 'next-view-transitions'
 import {
 	Tooltip,
 	TooltipContent,
@@ -6,6 +5,7 @@ import {
 	TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { ArrowLeftIcon } from 'lucide-react'
+import Link from 'next/link'
 
 interface notFoundProps {
 	h1: string

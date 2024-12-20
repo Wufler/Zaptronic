@@ -1,11 +1,19 @@
-import { auth } from '@/auth'
-import { fetchProduct } from '@/components/actions/products/productsData'
-import { fetchWishlist } from '@/components/actions/wishlist/Wishlist'
+import { auth } from '@/lib/auth'
 import Product from '@/components/Products/Product'
+import { headers } from 'next/headers'
+import { fetchProducts } from '@/actions/products/productsData'
+import { fetchWishlist } from '@/actions/wishlist/Wishlist'
 
-export default async function ProductDetails({ params }: any) {
-	const product = await fetchProduct(Number(params.id))
-	const session = await auth()
+export default async function ProductDetails({
+	params,
+}: {
+	params: Promise<{ id: string }>
+}) {
+	const id = (await params).id
+	const product = await fetchProducts(false, Number(id))
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
 	const wishes = await fetchWishlist(session?.user.id || '')
 
 	return (

@@ -2,7 +2,7 @@
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 
-export async function updateUser(id: string, values: any) {
+export async function updateUser(id: string, values: { name: string, image: string }) {
     await prisma.user.update({
         where: { id },
         data: {

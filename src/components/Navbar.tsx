@@ -1,8 +1,7 @@
 'use client'
 
-import * as React from 'react'
-import { Link } from 'next-view-transitions'
-import { signOut } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -48,17 +47,21 @@ import Image from 'next/image'
 import { formatCurrency } from '@/lib/formatter'
 import { Badge } from './ui/badge'
 import Loading from './Loading'
-import { fetchProduct } from './actions/products/productsData'
+import { authClient } from '@/lib/auth-client'
+import { forwardRef, useState } from 'react'
+import { useEffect } from 'react'
+import { fetchProducts } from '@/actions/products/productsData'
 
 export default function Navbar({ user }: { user: any }) {
-	const [cartItems, setCartItems] = React.useState<any[]>([])
-	const [cartProducts, setCartProducts] = React.useState<any[]>([])
-	const [total, setTotal] = React.useState(0)
-	const [isLoading, setIsLoading] = React.useState(true)
-	const [isCartOpen, setIsCartOpen] = React.useState(false)
-	const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
+	const [cartItems, setCartItems] = useState([])
+	const [cartProducts, setCartProducts] = useState([])
+	const [total, setTotal] = useState(0)
+	const [isLoading, setIsLoading] = useState(true)
+	const [isCartOpen, setIsCartOpen] = useState(false)
+	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+	const router = useRouter()
 
-	React.useEffect(() => {
+	useEffect(() => {
 		setIsLoading(true)
 		const loadCartItems = async () => {
 			const storedCart = localStorage.getItem('cart')
@@ -66,7 +69,9 @@ export default function Navbar({ user }: { user: any }) {
 				const parsedCart = JSON.parse(storedCart)
 				setCartItems(parsedCart)
 
-				const productPromises = parsedCart.map((item: any) => fetchProduct(item.id))
+				const productPromises = parsedCart.map((item: any) =>
+					fetchProducts(false, item.id)
+				)
 				const products = await Promise.all(productPromises)
 				const productsWithQuantity = products.map((product, index) => ({
 					...product,
@@ -99,10 +104,16 @@ export default function Navbar({ user }: { user: any }) {
 		}
 	}, [])
 
-	const signOutToast = () => {
-		toast.success('Successfully signed out.', {
-			position: 'bottom-center',
+	async function userSignOut() {
+		await authClient.signOut({
+			fetchOptions: {
+				onSuccess: () => {
+					router.push('/')
+				},
+			},
 		})
+		router.refresh()
+		toast.success('Successfully signed out.')
 	}
 
 	const removeFromCart = (productId: number) => {
@@ -117,7 +128,7 @@ export default function Navbar({ user }: { user: any }) {
 	const closeMobileMenu = () => setIsMobileMenuOpen(false)
 
 	return (
-		<nav className="flex justify-between items-center py-4 px-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50 sticky top-0 w-full border-b max-w-screen-xl mx-auto md:rounded-b-2xl">
+		<nav className="flex justify-between items-center py-4 px-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50 sticky top-0 w-full max-w-screen-xl mx-auto md:rounded-b-2xl">
 			<div className="flex items-center gap-4">
 				<Link href="/" className="flex items-center space-x-2">
 					<Home className="size-6" />
@@ -163,7 +174,7 @@ export default function Navbar({ user }: { user: any }) {
 				<div className="flex items-center gap-2">
 					<Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
 						<SheetTrigger asChild>
-							<Button variant="ghost" size={'icon'} className="rounded-full relative">
+							<Button variant="ghost" size="icon" className="rounded-full relative">
 								{cartProducts.length > 0 && (
 									<Badge
 										variant={'destructive'}
@@ -172,7 +183,7 @@ export default function Navbar({ user }: { user: any }) {
 										{cartProducts.length}
 									</Badge>
 								)}
-								<ShoppingCart className="size-6" />
+								<ShoppingCart className="scale-125" />
 							</Button>
 						</SheetTrigger>
 						<SheetContent>
@@ -242,8 +253,8 @@ export default function Navbar({ user }: { user: any }) {
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<Avatar className="cursor-pointer">
-									<AvatarImage src={user?.user?.image} />
-									<AvatarFallback>{user?.user?.name?.charAt(0)}</AvatarFallback>
+									<AvatarImage src={user?.user?.image || null} />
+									<AvatarFallback>{user?.user?.name?.charAt(0) || ''}</AvatarFallback>
 								</Avatar>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end">
@@ -253,19 +264,19 @@ export default function Navbar({ user }: { user: any }) {
 								<DropdownMenuSeparator />
 								<DropdownMenuItem asChild>
 									<Link href="/profile">
-										<User className="mr-2 size-4" />
+										<User className="size-4" />
 										<span>Profile</span>
 									</Link>
 								</DropdownMenuItem>
 								<DropdownMenuItem asChild>
 									<Link href="/wishlist">
-										<Heart className="mr-2 size-4" />
+										<Heart className="size-4" />
 										<span>Wishlist</span>
 									</Link>
 								</DropdownMenuItem>
 								<DropdownMenuItem asChild>
 									<Link href="/orders">
-										<ShoppingBasket className="mr-2 size-4" />
+										<ShoppingBasket className="size-4" />
 										<span>Orders</span>
 									</Link>
 								</DropdownMenuItem>
@@ -274,26 +285,21 @@ export default function Navbar({ user }: { user: any }) {
 									<>
 										<DropdownMenuItem asChild>
 											<Link href="/admin">
-												<LockKeyhole className="mr-2 size-4 text-blue-400" />
+												<LockKeyhole className="size-4 text-blue-400" />
 												<span>Admin</span>
 											</Link>
 										</DropdownMenuItem>
 										<DropdownMenuItem asChild>
 											<Link href="/admin/create">
-												<PackagePlus className="mr-2 size-4 text-blue-400" />
+												<PackagePlus className="size-4 text-blue-400" />
 												<span>Create</span>
 											</Link>
 										</DropdownMenuItem>
 										<DropdownMenuSeparator />
 									</>
 								)}
-								<DropdownMenuItem
-									onClick={() => {
-										signOut()
-										signOutToast()
-									}}
-								>
-									<LogOut className="mr-2 size-4 text-destructive" />
+								<DropdownMenuItem onClick={userSignOut}>
+									<LogOut className="size-4 text-destructive" />
 									<span>Sign Out</span>
 								</DropdownMenuItem>
 							</DropdownMenuContent>
@@ -347,29 +353,28 @@ export default function Navbar({ user }: { user: any }) {
 	)
 }
 
-const ListItem = React.forwardRef<
-	React.ElementRef<'a'>,
-	React.ComponentPropsWithoutRef<'a'>
->(({ className, title, children, ...props }, ref) => {
-	return (
-		<li>
-			<NavigationMenuLink asChild>
-				<Link
-					ref={ref}
-					className={cn(
-						'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
-						className
-					)}
-					{...props}
-					href={props.href || ''}
-				>
-					<div className="text-sm font-medium leading-none">{title}</div>
-					<p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-						{children}
-					</p>
-				</Link>
-			</NavigationMenuLink>
-		</li>
-	)
-})
+const ListItem = forwardRef<ElementRef<'a'>, ComponentPropsWithoutRef<'a'>>(
+	({ className, title, children, ...props }, ref) => {
+		return (
+			<li>
+				<NavigationMenuLink asChild>
+					<Link
+						ref={ref}
+						className={cn(
+							'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+							className
+						)}
+						{...props}
+						href={props.href || ''}
+					>
+						<div className="text-sm font-medium leading-none">{title}</div>
+						<p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+							{children}
+						</p>
+					</Link>
+				</NavigationMenuLink>
+			</li>
+		)
+	}
+)
 ListItem.displayName = 'ListItem'

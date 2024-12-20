@@ -2,14 +2,13 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from 'next-themes'
-import { ViewTransitions } from 'next-view-transitions'
-import { auth } from '@/auth'
 import Footer from '@/components/Footer'
 import { Toaster } from '@/components/ui/sonner'
 import Navbar from '@/components/Navbar'
-import Dev from '@/components/Dev'
 import NextTopLoader from 'nextjs-toploader'
 const inter = Inter({ subsets: ['latin'] })
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
 
 export const metadata: Metadata = {
 	title: 'Zaptronic',
@@ -36,21 +35,26 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode
 }>) {
-	const session = await auth()
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
 	return (
-		<ViewTransitions>
-			<html lang="en" suppressHydrationWarning>
-				<body className={inter.className}>
-					<ThemeProvider defaultTheme="system" attribute="class">
-						<NextTopLoader showSpinner={false} />
-						<Navbar user={session} />
-						{children}
-						<Footer />
-						<Toaster />
-						<Dev />
-					</ThemeProvider>
-				</body>
-			</html>
-		</ViewTransitions>
+		<html lang="en" suppressHydrationWarning>
+			<body className={inter.className}>
+				<ThemeProvider
+					attribute="class"
+					defaultTheme="system"
+					enableSystem
+					disableTransitionOnChange
+				>
+					<NextTopLoader showSpinner={false} />
+					<Navbar user={session} />
+					{children}
+					<Footer />
+					<Toaster position="bottom-center" />
+				</ThemeProvider>
+			</body>
+		</html>
 	)
 }

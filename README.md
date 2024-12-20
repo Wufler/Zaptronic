@@ -1,39 +1,51 @@
-## Zaptronic
+# Zaptronic
 
-E-commerce Store Project
+Made up ecommerce store with working payment and order management.
 
-### Installation
+## Setup
 
-1. `npm install` to get all dependencies installed
-2. Grab your postgreSQL URL from your database and paste it to DATABASE_URL (Be sure to change your schema by adding `&schema=your_schema_name` at the end of your postgreSQL url)
-3. Run `npx prisma generate` and then `npx prisma studio` to see all your data
-4. https://authjs.dev/getting-started/installation Insert `npx auth secret` into AUTH_SECRET
-5. `npm run dev`
+1. **Clone the repository**
 
-### Extra features
+```bash
+git clone https://github.com/WoIfey/Zaptronic.git
+cd Zaptronic
+```
 
-6. https://github.com/settings/developers Create a new OAuth app and grab AUTH_GITHUB_ID from Client ID and AUTH_GITHUB_SECRET from Client secrets (generate a new client secret)
-7. https://dashboard.stripe.com/ Get NEXT_PUBLIC_STRIPE_PUBLIC_KEY from publishable key and STRIPE_SECRET_KEY from Secret key
-8. https://resend.com Resend is not required, you can use any other provider that suits your liking https://authjs.dev/getting-started/authentication/email. EMAIL is from SMTP in settings and AUTH_RESEND_KEY is from API Keys
+2. **Install dependencies**
 
-### Todo
+```bash
+pnpm install
+```
 
-- [x] Homepage
-- [x] Prisma
-- [x] Auth.js
-- [x] Stripe
-- [x] Products
-- [x] Login
-- [x] Orders
-- [x] Wishlist
-- [x] Settings
-- [x] Cart
-- [x] Admin
-- [x] Reviews
-- [ ] Featured Products
-- [ ] Search
-- [ ] Params
-- [ ] Pagination
-- [ ] User Address
-- [ ] Stripe Integrate Products
-- [ ] Remove ability to review and purchase disallowed products
+3. **Configure environment variables**
+
+Copy the `env.example` file and rename it to `.env` and set the following variables from:
+
+- Better Auth:
+  https://www.better-auth.com/docs/installation#set-environment-variables
+- GitHub Provider:
+  https://github.com/settings/developers
+  - Discord Provider:
+    https://discord.com/developers/applications
+- Stripe:
+  https://dashboard.stripe.com/test/dashboard
+- Nodemailer:
+  https://nodemailer.com/usage/using-gmail/
+
+4. **Initialize the database**
+
+```bash
+pnpm docker
+```
+
+5. **Run database migrations**
+
+```bash
+pnpm prisma
+```
+
+6. **Start the development server**
+
+```bash
+pnpm dev
+```

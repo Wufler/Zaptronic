@@ -1,14 +1,22 @@
-import { auth } from '@/auth'
+import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import NotFound from '@/app/not-found'
 import Edit from '@/components/Admin/Edit'
-import { fetchProduct } from '@/components/actions/products/productsData'
-import { fetchCategories } from '@/components/actions/products/categories'
+import { fetchProducts } from '@/actions/products/productsData'
+import { fetchCategories } from '@/actions/products/categories'
+import { headers } from 'next/headers'
 
-export default async function CreatePage({ params }: any) {
-	const product = await fetchProduct(Number(params.id))
+export default async function CreatePage({
+	params,
+}: {
+	params: Promise<{ id: string }>
+}) {
+	const id = (await params).id
+	const product = await fetchProducts(false, Number(id))
 	const categories = await fetchCategories()
-	const session = await auth()
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
 
 	if (!session) {
 		redirect('/login')

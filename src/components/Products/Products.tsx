@@ -2,19 +2,18 @@
 
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
-import { Link } from 'next-view-transitions'
-import { CheckCircle2, Star, X, ShoppingCart, Heart } from 'lucide-react'
+import Link from 'next/link'
+import { CheckCircle2, Star, X, Heart } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { discountPercentage, formatCurrency } from '@/lib/formatter'
 import { toast } from 'sonner'
-import { Products as ProductTypes } from '@/app/types'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { calculateAverage } from '../actions/averageRating'
+import { calculateAverage } from '@/actions/averageRating'
 import { unstable_noStore as noStore } from 'next/cache'
 import { useRouter } from 'next/navigation'
 import Loading from '@/components/Loading'
-import { createWish, deleteWish } from '../actions/wishlist/Wishlist'
+import { createWish, deleteWish } from '@/actions/wishlist/Wishlist'
 
 export default function Products({
 	products,
@@ -36,7 +35,7 @@ export default function Products({
 	}, [])
 
 	const filteredProducts = selectedCategory
-		? products?.filter((product: ProductTypes) =>
+		? products?.filter((product: Products) =>
 				product?.categories.some(
 					(category: any) => category?.slug === selectedCategory
 				)
@@ -45,7 +44,7 @@ export default function Products({
 
 	const uniqueCategories = Array.from(
 		new Map(
-			products.map((item: ProductTypes) => [item.categories[0]?.slug, item])
+			products.map((item: Products) => [item.categories[0]?.slug, item])
 		).values()
 	)
 
@@ -100,7 +99,7 @@ export default function Products({
 				</div>
 			) : (
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-					{filteredProducts.map((product: ProductTypes) => (
+					{filteredProducts.map((product: Products) => (
 						<ProductCard
 							key={product.id}
 							product={product}
@@ -119,7 +118,7 @@ export function ProductCard({
 	user,
 	wishes,
 }: {
-	product: ProductTypes
+	product: Products
 	user?: any
 	wishes: any
 }) {
@@ -155,8 +154,7 @@ export function ProductCard({
 					<div className="flex gap-2">
 						<X className="size-5" />
 						<span>Product removed from cart.</span>
-					</div>,
-					{ position: 'bottom-center' }
+					</div>
 				)
 			} else {
 				cart.push({ id: product.id, quantity: 1 })
@@ -166,15 +164,13 @@ export function ProductCard({
 					<div className="flex gap-2">
 						<CheckCircle2 className="size-5" />
 						<span>Product successfully added to cart.</span>
-					</div>,
-					{ position: 'bottom-center' }
+					</div>
 				)
 			}
 			window.dispatchEvent(new Event('cartUpdated'))
 		} catch (error) {
-			toast.error('Failed to update cart. Please try again.', {
-				position: 'bottom-center',
-			})
+			toast.error('Failed to update cart. Please try again.')
+			console.error('Error adding to cart:', error)
 		} finally {
 			setIsAddingToCart(false)
 		}
@@ -191,9 +187,8 @@ export function ProductCard({
 			window.dispatchEvent(new Event('cartUpdated'))
 			router.push('/cart')
 		} catch (error) {
-			toast.error('Failed to purchase product. Please try again.', {
-				position: 'bottom-center',
-			})
+			toast.error('Failed to purchase product. Please try again.')
+			console.error('Error purchasing product:', error)
 		} finally {
 			setIsPurchasing(false)
 		}
@@ -213,9 +208,7 @@ export function ProductCard({
 				setIsInWishlist(true)
 			}
 		} catch (error) {
-			toast.error(`Failed to wishlist product: ${error}`, {
-				position: 'bottom-center',
-			})
+			toast.error(`Failed to wishlist product: ${error}`)
 		} finally {
 			setTimeout(() => {
 				setIsWishing(false)

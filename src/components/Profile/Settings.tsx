@@ -1,9 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { signIn } from 'next-auth/webauthn'
 import { toast } from 'sonner'
-import { KeyIcon, SettingsIcon, Loader2Icon, LockKeyhole } from 'lucide-react'
+import { KeyIcon, SettingsIcon, LockKeyhole } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Input } from '@/components/ui/input'
@@ -17,9 +16,9 @@ import {
 	DialogTrigger,
 } from '@/components/ui/dialog'
 import Loading from '@/components/Loading'
-import { Link } from 'next-view-transitions'
-import { updateUser } from '../actions/admin/userData'
-
+import Link from 'next/link'
+import { updateUser } from '@/actions/admin/userData'
+import { authClient } from '@/lib/auth-client'
 export default function Settings({
 	user,
 	initialName = user?.user?.name,
@@ -33,14 +32,11 @@ export default function Settings({
 	const handleRegister = async () => {
 		setIsLoading(true)
 		try {
-			await signIn('passkey', { action: 'register' })
-			toast.success('Passkey registered successfully', {
-				position: 'bottom-center',
-			})
+			await authClient.passkey.addPasskey()
+			toast.success('Passkey registered successfully')
 		} catch (error) {
-			toast.error('Passkey registration failed', {
-				position: 'bottom-center',
-			})
+			toast.error('Passkey registration failed')
+			console.error('Error registering passkey:', error)
 		} finally {
 			setIsLoading(false)
 		}
@@ -50,14 +46,11 @@ export default function Settings({
 		setIsLoading(true)
 		try {
 			await updateUser(user?.user?.id, { name, image: picture })
-			toast.success('Profile updated successfully', {
-				position: 'bottom-center',
-			})
+			toast.success('Profile updated successfully')
 			setIsOpen(false)
 		} catch (error) {
-			toast.error('Failed to update profile', {
-				position: 'bottom-center',
-			})
+			toast.error('Failed to update profile')
+			console.error('Error updating profile:', error)
 		} finally {
 			setIsLoading(false)
 		}

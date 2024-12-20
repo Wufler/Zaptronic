@@ -1,7 +1,7 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import Image from 'next/image'
-import { Link } from 'next-view-transitions'
+import Link from 'next/link'
 import { toast } from 'sonner'
 import {
 	CheckCircle2,
@@ -43,12 +43,12 @@ import { discountPercentage } from '@/lib/formatter'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { format } from 'date-fns'
-import { calculateAverage } from '../actions/averageRating'
-import { createWish, deleteWish } from '../actions/wishlist/Wishlist'
 import { useRouter } from 'next/navigation'
 import Loading from '@/components/Loading'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { createWish, deleteWish } from '@/actions/wishlist/Wishlist'
+import { calculateAverage } from '@/actions/averageRating'
 
 export default function Product({
 	product,
@@ -88,13 +88,14 @@ export default function Product({
 		[api]
 	)
 
-	const flattenedImages = product.images.flatMap((image: any, i: number) =>
-		image.src.map((src: string, j: number) => ({
-			src,
-			alt: image.alt,
-			index: i * image.src.length + j,
-		}))
-	)
+	const flattenedImages =
+		product.images?.flatMap((image: any, i: number) =>
+			image.src.map((src: string, j: number) => ({
+				src,
+				alt: image.alt,
+				index: i * image.src.length + j,
+			}))
+		) || []
 
 	useEffect(() => {
 		const cart = JSON.parse(localStorage.getItem('cart') || '[]')
@@ -133,8 +134,7 @@ export default function Product({
 					<div className="flex gap-2">
 						<X className="size-5" />
 						<span>Product removed from cart.</span>
-					</div>,
-					{ position: 'bottom-center' }
+					</div>
 				)
 			} else {
 				cart.push({ id: product.id, quantity: 1 })
@@ -144,15 +144,13 @@ export default function Product({
 					<div className="flex gap-2">
 						<CheckCircle2 className="size-5" />
 						<span>Product successfully added to cart.</span>
-					</div>,
-					{ position: 'bottom-center' }
+					</div>
 				)
 			}
 			window.dispatchEvent(new Event('cartUpdated'))
 		} catch (error) {
-			toast.error('Failed to update cart. Please try again.', {
-				position: 'bottom-center',
-			})
+			toast.error('Failed to update cart. Please try again.')
+			console.error('Error adding to cart:', error)
 		} finally {
 			setIsAddingToCart(false)
 		}
@@ -169,9 +167,8 @@ export default function Product({
 			window.dispatchEvent(new Event('cartUpdated'))
 			router.push('/cart')
 		} catch (error) {
-			toast.error('Failed to purchase product. Please try again.', {
-				position: 'bottom-center',
-			})
+			toast.error('Failed to purchase product. Please try again.')
+			console.error('Error purchasing product:', error)
 		} finally {
 			setIsPurchasing(false)
 		}
@@ -191,9 +188,8 @@ export default function Product({
 				setIsInWishlist(true)
 			}
 		} catch (error) {
-			toast.error(`Failed to wishlist product: ${error}`, {
-				position: 'bottom-center',
-			})
+			toast.error(`Failed to wishlist product: ${error}`)
+			console.error('Error wishing product:', error)
 		} finally {
 			setTimeout(() => {
 				setIsWishing(false)
@@ -220,7 +216,7 @@ export default function Product({
 	}
 
 	const averageRating = calculateAverage(
-		product.reviews.map((review: any) => review.rating)
+		product.reviews?.map((review: any) => review.rating) || []
 	)
 
 	return (
@@ -493,7 +489,7 @@ export default function Product({
 
 							<Carousel className="w-full">
 								<CarouselContent>
-									{product.reviews.slice(0, 5).map((review: any) => (
+									{product.reviews?.slice(0, 5).map((review: any) => (
 										<CarouselItem
 											key={review.id}
 											className="pl-4 sm:basis-1/2 lg:basis-1/3"

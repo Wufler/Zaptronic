@@ -3,25 +3,11 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-// Define types for your category
-type Category = {
-    id: number;
-    name: string;
-    slug: string;
-};
-
-type CategoryInput = Omit<Category, 'id'>;
-
 export async function fetchCategories(): Promise<Category[]> {
     try {
         const categories = await prisma.categories.findMany({
             orderBy: {
                 createdAt: 'desc',
-            },
-            select: {
-                id: true,
-                name: true,
-                slug: true,
             },
         });
         return categories;
@@ -31,7 +17,7 @@ export async function fetchCategories(): Promise<Category[]> {
     }
 }
 
-export async function createCategory(data: CategoryInput): Promise<Category> {
+export async function createCategory(data: Category): Promise<Category> {
     try {
         const newCategory = await prisma.categories.create({
             data: {

@@ -1,19 +1,22 @@
 import Image from 'next/image'
-import { Link } from 'next-view-transitions'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowRightIcon, ShoppingBagIcon } from 'lucide-react'
 import { discountPercentage, formatCurrency } from '@/lib/formatter'
 import { Badge } from '@/components/ui/badge'
-import { auth } from '@/auth'
 import HomeProducts from '@/components/Products/HomeProducts'
-import { fetchWishlist } from '@/components/actions/wishlist/Wishlist'
-import { fetchProducts } from '@/components/actions/products/productsData'
+import { fetchWishlist } from '@/actions/wishlist/Wishlist'
+import { fetchProducts } from '@/actions/products/productsData'
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
 
 export default async function Component() {
-	const products = await fetchProducts()
+	const products = await fetchProducts(false)
 	const featured = products[0]
 	const discount = discountPercentage(featured)
-	const session = await auth()
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
 	const wishes = await fetchWishlist(session?.user.id || '')
 
 	return (
