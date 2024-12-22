@@ -1,5 +1,4 @@
 import { auth } from '@/lib/auth'
-import Passkey from '@/components/Login/Passkey'
 import Providers from '@/components/Login/Providers'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
@@ -26,7 +25,6 @@ export default async function LoginPage() {
 				<div className="space-y-4">
 					<Email />
 					<Providers />
-					<Passkey />
 				</div>
 			</div>
 		</main>

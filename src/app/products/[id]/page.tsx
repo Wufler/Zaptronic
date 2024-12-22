@@ -14,7 +14,7 @@ export default async function ProductDetails({
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	})
-	const wishes = await fetchWishlist(session?.user.id || '')
+	const wishes = await fetchWishlist()
 
 	return (
 		<div className="dark:bg-primary-black bg-primary-white min-h-dvh">

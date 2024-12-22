@@ -8,12 +8,11 @@ import { Button } from '@/components/ui/button'
 import { discountPercentage, formatCurrency } from '@/lib/formatter'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
 import { calculateAverage } from '@/actions/averageRating'
 import { unstable_noStore as noStore } from 'next/cache'
 import { useRouter } from 'next/navigation'
 import Loading from '@/components/Loading'
-import { createWish, deleteWish } from '@/actions/wishlist/Wishlist'
+import { createWish } from '@/actions/wishlist/Wishlist'
 
 export default function Products({
 	products,
@@ -26,13 +25,6 @@ export default function Products({
 }) {
 	noStore()
 	const [selectedCategory, setSelectedCategory] = useState<string>('')
-	const [isLoading, setIsLoading] = useState(true)
-
-	// Fake Timer
-	useEffect(() => {
-		const timer = setTimeout(() => setIsLoading(false), 125)
-		return () => clearTimeout(timer)
-	}, [])
 
 	const filteredProducts = selectedCategory
 		? products?.filter((product: Products) =>
@@ -82,13 +74,7 @@ export default function Products({
 				))}
 			</div>
 
-			{isLoading ? (
-				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-					{[...Array(8)].map((_, index) => (
-						<ProductCardSkeleton key={index} />
-					))}
-				</div>
-			) : filteredProducts.length === 0 ? (
+			{filteredProducts.length === 0 ? (
 				<div className="text-center py-12">
 					<p className="text-2xl font-semibold dark:text-white">No products found</p>
 					<p className="text-muted-foreground mt-2">
@@ -137,6 +123,10 @@ export function ProductCard({
 			cart.some((item: { id: string | number }) => item.id === product.id)
 		)
 	}, [product])
+
+	useEffect(() => {
+		setIsInWishlist(wishes.some(wish => Number(wish.productsId) === product.id))
+	}, [wishes, product.id])
 
 	async function handleAddToCart() {
 		setIsAddingToCart(true)
@@ -197,22 +187,11 @@ export function ProductCard({
 	async function handleWish() {
 		setIsWishing(true)
 		try {
-			const wishlistItem = wishes?.find(
-				item => item.productsId === String(product.id)
-			)
-			if (wishlistItem) {
-				await deleteWish(wishlistItem.id)
-				setIsInWishlist(false)
-			} else {
-				await createWish(user?.user?.id as string, product.id.toString())
-				setIsInWishlist(true)
-			}
+			await createWish(product.id.toString())
+			setIsWishing(false)
 		} catch (error) {
-			toast.error(`Failed to wishlist product: ${error}`)
-		} finally {
-			setTimeout(() => {
-				setIsWishing(false)
-			}, 2000)
+			toast.error(`Failed to wishlist product`)
+			console.error('Error wishing product:', error)
 		}
 	}
 	return (
@@ -331,27 +310,6 @@ export function ProductCard({
 							</div>
 						)}
 					</div>
-				</div>
-			</div>
-		</div>
-	)
-}
-
-function ProductCardSkeleton() {
-	return (
-		<div className="bg-card rounded-lg shadow-md overflow-hidden">
-			<Skeleton className="w-full h-64 rounded-none" />
-			<div className="p-4">
-				<Skeleton className="h-6 w-full mb-2" />
-				<div className="flex justify-between gap-2 mb-2">
-					<Skeleton className="h-4 w-1/5" />
-					<Skeleton className="h-4 w-1/2" />
-				</div>
-				<Skeleton className="h-4 w-2/5 mb-4" />
-				<div className="flex gap-2">
-					<Skeleton className="h-10 w-1/2" />
-					<Skeleton className="h-10 w-1/2" />
-					<Skeleton className="h-10 w-1/6" />
 				</div>
 			</div>
 		</div>

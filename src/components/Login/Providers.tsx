@@ -1,36 +1,50 @@
 'use client'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { useState } from 'react'
+import { useTransition } from 'react'
 import { toast } from 'sonner'
 import Loading from '@/components/Loading'
 import { authClient } from '@/lib/auth-client'
 import { useRouter } from 'next/navigation'
+import { KeyIcon } from 'lucide-react'
 export default function Providers() {
-	const [isLoading, setIsLoading] = useState(false)
+	const [isPending, startTransition] = useTransition()
 	const router = useRouter()
 
+	const handleSignIn = async () => {
+		startTransition(async () => {
+			try {
+				await authClient.signIn.passkey()
+				router.push('/')
+			} catch (error) {
+				toast.error(`Passkey login failed`)
+				console.error('Passkey login failed', error)
+			}
+		})
+	}
+
 	const handleGitHub = async () => {
-		setIsLoading(true)
-		try {
-			await authClient.signIn.social({ provider: 'github', callbackURL: '/' })
-			router.refresh()
-		} catch (error) {
-			toast.error(`GitHub sign-in failed: ${error}`)
-		} finally {
-			setIsLoading(false)
-		}
+		startTransition(async () => {
+			try {
+				await authClient.signIn.social({ provider: 'github', callbackURL: '/' })
+				router.refresh()
+			} catch (error) {
+				toast.error(`GitHub sign-in failed`)
+				console.error('GitHub sign-in failed', error)
+			}
+		})
 	}
 
 	const handleDiscord = async () => {
-		setIsLoading(true)
-		try {
-			await authClient.signIn.social({ provider: 'discord', callbackURL: '/' })
-		} catch (error) {
-			toast.error(`Discord sign-in failed: ${error}`)
-		} finally {
-			setIsLoading(false)
-		}
+		startTransition(async () => {
+			try {
+				await authClient.signIn.social({ provider: 'discord', callbackURL: '/' })
+				router.refresh()
+			} catch (error) {
+				toast.error(`Discord sign-in failed`)
+				console.error('Discord sign-in failed', error)
+			}
+		})
 	}
 
 	return (
@@ -50,9 +64,9 @@ export default function Providers() {
 					variant="outline"
 					className="flex gap-2 w-full"
 					onClick={handleGitHub}
-					disabled={isLoading}
+					disabled={isPending}
 				>
-					{isLoading ? (
+					{isPending ? (
 						<Loading size={16} />
 					) : (
 						<Image
@@ -69,9 +83,9 @@ export default function Providers() {
 					variant="outline"
 					className="flex gap-2 w-full"
 					onClick={handleDiscord}
-					disabled={isLoading}
+					disabled={isPending}
 				>
-					{isLoading ? (
+					{isPending ? (
 						<Loading size={16} />
 					) : (
 						<Image
@@ -85,6 +99,15 @@ export default function Providers() {
 					Discord
 				</Button>
 			</div>
+			<Button
+				variant="outline"
+				className="flex gap-2 w-full"
+				onClick={handleSignIn}
+				disabled={isPending}
+			>
+				{isPending ? <Loading size={16} /> : <KeyIcon className="size-4" />}
+				Passkey
+			</Button>
 		</>
 	)
 }

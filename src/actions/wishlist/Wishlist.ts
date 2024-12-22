@@ -1,11 +1,17 @@
 "use server"
 import { revalidatePath } from "next/cache"
 import prisma from "@/lib/prisma";
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
 
-export async function fetchWishlist(id: string) {
+
+export async function fetchWishlist() {
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    })
     return await prisma.wishlist.findMany({
         where: {
-            userId: id,
+            userId: session?.user?.id || '',
         },
         orderBy: {
             createdAt: 'desc',
@@ -21,21 +27,31 @@ export async function fetchWishlist(id: string) {
     });
 }
 
-export async function deleteWish(id: number) {
-    await prisma.wishlist.delete({
-        where: {
-            id: id,
-        }
+export async function createWish(data: string) {
+    const session = await auth.api.getSession({
+        headers: await headers(),
     })
-    revalidatePath('/')
-}
-
-export async function createWish(id: string, data: string) {
-    await prisma.wishlist.create({
-        data: {
-            userId: id,
+    const existingWish = await prisma.wishlist.findFirst({
+        where: {
+            userId: session?.user?.id || '',
             productsId: Number(data),
         },
-    })
-    revalidatePath('/')
+    });
+
+    if (existingWish) {
+        await prisma.wishlist.delete({
+            where: {
+                id: existingWish.id,
+            },
+        });
+    } else {
+        await prisma.wishlist.create({
+            data: {
+                userId: session?.user?.id || '',
+                productsId: Number(data),
+            },
+        });
+    }
+    revalidatePath('/');
 }
+

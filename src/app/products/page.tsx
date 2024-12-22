@@ -9,7 +9,7 @@ export default async function Home() {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	})
-	const wishes = await fetchWishlist(session?.user.id || '')
+	const wishes = await fetchWishlist()
 
 	return (
 		<main className="min-h-dvh dark:bg-primary-black bg-primary-white">

@@ -23,11 +23,16 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { deleteWish } from '@/actions/wishlist/Wishlist'
+import { createWish } from '@/actions/wishlist/Wishlist'
+import { useTransition } from 'react'
 
 export default function Wishlist({ wishes }: { wishes: WishlistItem[] }) {
+	const [isPending, startTransition] = useTransition()
+
 	async function handleDelete(id: number) {
-		await deleteWish(id)
+		startTransition(async () => {
+			await createWish(id.toString())
+		})
 	}
 
 	return (
@@ -132,7 +137,11 @@ export default function Wishlist({ wishes }: { wishes: WishlistItem[] }) {
 													</Button>
 													<AlertDialog>
 														<AlertDialogTrigger asChild>
-															<Button variant="outline" className="flex-1">
+															<Button
+																variant="outline"
+																className="flex-1"
+																disabled={isPending}
+															>
 																Remove from Wishlist
 															</Button>
 														</AlertDialogTrigger>
@@ -147,7 +156,7 @@ export default function Wishlist({ wishes }: { wishes: WishlistItem[] }) {
 																<AlertDialogCancel>Cancel</AlertDialogCancel>
 																<AlertDialogAction asChild>
 																	<Button
-																		onClick={() => handleDelete(wish.id)}
+																		onClick={() => handleDelete(wish.products.id)}
 																		variant="destructive"
 																	>
 																		Remove
