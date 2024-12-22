@@ -49,7 +49,7 @@ export default async function RootLayout({
 					disableTransitionOnChange
 				>
 					<NextTopLoader showSpinner={false} />
-					<Navbar user={session} />
+					<Navbar user={session as unknown as User} />
 					{children}
 					<Footer />
 					<Toaster position="bottom-center" />

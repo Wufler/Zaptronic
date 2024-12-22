@@ -127,7 +127,7 @@ export default function Navbar({ user }: { user: User }) {
 				</Link>
 				<Button asChild variant="link" className="rounded-full">
 					<Link href="/products" className="bg-transparent rounded-full">
-						Products1
+						Products
 					</Link>
 				</Button>
 			</div>
