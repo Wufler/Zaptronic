@@ -11,7 +11,7 @@ import {
 import { formatCurrency } from '@/lib/formatter'
 import { calculateAverage } from '@/actions/averageRating'
 
-export default function Products({ products }: any) {
+export default function Products({ products }: { products: Products[] }) {
 	return (
 		<div className="my-8">
 			<div className="flex justify-between sm:flex-row flex-col sm:gap-0 gap-4 sm:items-center mb-4 text-2xl font-bold">
@@ -23,7 +23,7 @@ export default function Products({ products }: any) {
 				</Button>
 			</div>
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-				{products.map((product: any) => (
+				{products.map(product => (
 					<div key={product.id}>
 						<Card>
 							<CardHeader>
@@ -50,7 +50,7 @@ export default function Products({ products }: any) {
 												<Star className="fill-yellow-500 text-yellow-500 mr-1 size-4" />
 												<span>
 													{calculateAverage(
-														product.reviews.map((review: any) => review.rating)
+														product.reviews.map(review => review.rating)
 													).toFixed(1)}
 												</span>
 											</div>

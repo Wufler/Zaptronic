@@ -12,10 +12,10 @@ export default function Admin({
 	categories,
 	products,
 }: {
-	sales: any
-	user: any
-	categories: any
-	products: any
+	sales: Sales
+	user: User
+	categories: Category[]
+	products: Products[]
 }) {
 	return (
 		<div className="max-w-7xl mx-auto">
@@ -39,9 +39,11 @@ export default function Admin({
 						<Users className="size-4 text-muted-foreground" />
 					</CardHeader>
 					<CardContent>
-						<div className="text-2xl font-bold">{formatNumber(user.userCount)}</div>
+						<div className="text-2xl font-bold">
+							{formatNumber(user.userCount ?? 0)}
+						</div>
 						<p className="text-xs text-muted-foreground">
-							Avg. {formatCurrency(user.averageValuePerUser)} per user
+							Avg. {formatCurrency(user.averageValuePerUser ?? 0)} per user
 						</p>
 					</CardContent>
 				</Card>
@@ -66,7 +68,7 @@ export default function Admin({
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">
-							{((sales.numberOfSales / user.userCount) * 100).toFixed(2)}%
+							{((sales.numberOfSales / (user.userCount ?? 0)) * 100).toFixed(2)}%
 						</div>
 						<p className="text-xs text-muted-foreground">Sales per customer</p>
 					</CardContent>

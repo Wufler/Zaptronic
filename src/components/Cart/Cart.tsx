@@ -26,9 +26,9 @@ if (process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY === undefined) {
 }
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
 
-export default function CheckoutPage({ user }: { user: any }) {
-	const [cartItems, setCartItems] = useState<any[]>([])
-	const [cartProducts, setCartProducts] = useState<any[]>([])
+export default function CheckoutPage({ user }: { user: User }) {
+	const [cartItems, setCartItems] = useState<CartItem[]>([])
+	const [cartProducts, setCartProducts] = useState<Products[]>([])
 	const [total, setTotal] = useState(0)
 	const [isLoading, setIsLoading] = useState(true)
 	const [clientSecret, setClientSecret] = useState('')
@@ -41,7 +41,7 @@ export default function CheckoutPage({ user }: { user: any }) {
 				const parsedCart = JSON.parse(storedCart)
 				setCartItems(parsedCart)
 
-				const productPromises = parsedCart.map((item: any) =>
+				const productPromises = parsedCart.map((item: CartItem) =>
 					fetchProducts(false, item.id)
 				)
 				const products = await Promise.all(productPromises)
@@ -52,8 +52,11 @@ export default function CheckoutPage({ user }: { user: any }) {
 				setCartProducts(productsWithQuantity)
 
 				const newTotal = productsWithQuantity.reduce(
-					(acc: number, product: any) =>
-						acc + Number(product.price) * product.quantity,
+					(acc: number, product: Products) =>
+						acc +
+						Number(
+							product.sale_price || product.price
+						) /* * product.stock_quantity */,
 					0
 				)
 				setTotal(newTotal)
@@ -111,8 +114,9 @@ export default function CheckoutPage({ user }: { user: any }) {
 		)
 		setCartProducts(updatedProducts)
 		const newTotal = updatedProducts.reduce(
-			(acc: number, product: any) =>
-				acc + Number(product.price) * product.quantity,
+			(acc: number, product: Products) =>
+				acc +
+				Number(product.sale_price || product.price) /* * product.stock_quantity */,
 			0
 		)
 		setTotal(newTotal)
@@ -168,11 +172,17 @@ export default function CheckoutPage({ user }: { user: any }) {
 											/>
 											<div>
 												<h3 className="font-semibold">{item.name}</h3>
-												<p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+												<p className="text-sm text-gray-600">
+													Quantity: {item.stock_quantity}
+												</p>
 											</div>
 										</div>
 										<div className="flex items-center">
-											<p className="mr-4">{formatCurrency(item.price * item.quantity)}</p>
+											<p className="mr-4">
+												{formatCurrency(
+													Number(item.sale_price || item.price) /* * item.stock_quantity */
+												)}
+											</p>
 											<Button
 												variant="ghost"
 												size="icon"
@@ -214,7 +224,7 @@ export default function CheckoutPage({ user }: { user: any }) {
 								>
 									<CheckoutForm
 										amount={total}
-										cartItems={cartProducts}
+										cartItems={cartProducts as unknown as CartItem[]}
 										session={user}
 										clientSecret={clientSecret}
 									/>

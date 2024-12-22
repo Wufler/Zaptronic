@@ -1,5 +1,4 @@
 'use client'
-
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -16,35 +15,40 @@ import {
 	CalendarDays,
 	CreditCard,
 	Heart,
+	Loader2,
 	Package,
 	ShoppingBag,
 } from 'lucide-react'
-import { format } from 'date-fns'
+import { format, formatISO } from 'date-fns'
 import { formatCurrency } from '@/lib/formatter'
 import Settings from './Settings'
+import { authClient } from '@/lib/auth-client'
 
-export default function Profile({ user, orders }: { user: any; orders: any }) {
+export default function Profile({ orders }: { orders: Order[] }) {
+	const { data: session, isPending } = authClient.useSession()
+	if (isPending) return <Loader2 className="animate-spin size-10 mx-auto" />
 	return (
 		<Card className="max-w-4xl mx-auto">
 			<CardHeader>
 				<div className="flex items-center space-x-4">
 					<Avatar className="size-20">
-						<AvatarImage src={user?.user?.image} />
+						<AvatarImage src={session?.user?.image || ''} />
 						<AvatarFallback className="bg-primary text-primary-foreground text-2xl">
-							{user?.user?.name?.charAt(0) ?? ''}
+							{session?.user?.name?.charAt(0) ?? ''}
 						</AvatarFallback>
 					</Avatar>
 					<div>
 						<CardTitle className="text-2xl font-bold max-w-72 truncate">
-							{user?.user?.name}
+							{session?.user?.name}
 						</CardTitle>
 						<CardDescription className="max-w-72 truncate">
-							{user?.user?.email}
+							{session?.user?.email}
 						</CardDescription>
 						<div className="flex items-center mt-2">
 							<CalendarDays className="size-4 mr-2" />
 							<span className="text-sm text-muted-foreground">
-								Customer since {new Date(user?.user?.createdAt).toLocaleDateString()}
+								Customer since{' '}
+								{format(new Date(session?.user?.createdAt || ''), 'MMMM dd, yyyy')}
 							</span>
 						</div>
 					</div>
@@ -80,7 +84,7 @@ export default function Profile({ user, orders }: { user: any; orders: any }) {
 								</Button>
 							</div>
 							<div className="flex flex-col gap-4">
-								{orders.slice(0, 2).map((order: any) => (
+								{orders.slice(0, 2).map(order => (
 									<Card key={order.orderId}>
 										<CardHeader className="pt-4 pb-2 space-y-0 px-6">
 											<div className="flex justify-between items-center">
@@ -89,10 +93,10 @@ export default function Profile({ user, orders }: { user: any; orders: any }) {
 													Order #{order.orderId}
 													<div className="text-muted-foreground">
 														<time
-															title={new Date(order.createdAt).toLocaleString()}
-															dateTime={new Date(order.createdAt).toISOString()}
+															title={format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}
+															dateTime={formatISO(new Date(order.createdAt))}
 														>
-															{format(order.createdAt, 'MMMM dd, yyyy')}
+															{format(new Date(order.createdAt), 'MMMM dd, yyyy')}
 														</time>
 													</div>
 												</CardTitle>
@@ -107,7 +111,11 @@ export default function Profile({ user, orders }: { user: any; orders: any }) {
 											</div>
 										</CardHeader>
 										<CardContent className="pt-0 pb-4 space-y-0 px-6">
-											<div>{order.products.name}</div>
+											<div>
+												{order.products.map(product => (
+													<div key={product.id}>{product.name}</div>
+												))}
+											</div>
 											<p className="text-muted-foreground text-sm">
 												{formatCurrency(order.price_paid)}
 											</p>
@@ -122,11 +130,11 @@ export default function Profile({ user, orders }: { user: any; orders: any }) {
 			<CardFooter className="flex flex-wrap justify-end gap-4">
 				<Button asChild>
 					<Link href="/wishlist">
-						<Heart className="mr-2 size-4" />
+						<Heart className="size-4" />
 						Wishlist
 					</Link>
 				</Button>
-				<Settings user={user} />
+				<Settings />
 				{/* <Dialog>
 					<DialogTrigger asChild>
 						<Button variant="outline">
@@ -153,7 +161,7 @@ function StatCard({
 	title,
 	value,
 }: {
-	icon: any
+	icon: React.ComponentType<{ className?: string }>
 	title: string
 	value: string | number
 }) {

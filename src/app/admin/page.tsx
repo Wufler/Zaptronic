@@ -27,9 +27,9 @@ export default async function Component() {
 		<div className="min-h-screen bg-background p-6">
 			<Admin
 				sales={salesData}
-				user={userData}
+				user={userData as unknown as User}
 				categories={categories}
-				products={products}
+				products={products as unknown as Products[]}
 			/>
 		</div>
 	)

@@ -2,7 +2,7 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function editProduct(data: any, productId: number, imageId: number) {
+export async function editProduct(data: Products, productId: number, imageId: number) {
     await prisma.products.update({
         where: {
             id: productId,
@@ -12,16 +12,16 @@ export async function editProduct(data: any, productId: number, imageId: number)
             slug: data.slug,
             description: data.description,
             price: data.price,
-            sale_price: data.salePrice,
-            purchase_note: data.purchaseNote,
+            sale_price: data.sale_price,
+            purchase_note: data.purchase_note,
             visible: data.visible,
             purchasable: data.purchasable,
-            reviews_allowed: data.reviews,
+            reviews_allowed: data.reviews_allowed,
             featured: data.featured,
-            stock_quantity: data.stock,
+            stock_quantity: data.stock_quantity,
             categories: {
-                set: data.categories.map((category_id: string) => ({
-                    id: category_id,
+                set: data.categories.map((category: Category) => ({
+                    id: category.id,
                 })),
             },
             /* tags: {
@@ -43,7 +43,7 @@ export async function editProduct(data: any, productId: number, imageId: number)
                     },
                     data: {
                         alt: data.slug,
-                        src: data.images.map((image: { url: string }) => image.url),
+                        src: data.images.flatMap((image: { id: number; alt: string; src: string[]; createdAt: Date; updatedAt: Date; productsId: number }) => image.src),
                     },
                 },
             },

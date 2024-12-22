@@ -90,17 +90,17 @@ const FormSchema = z.object({
 		.min(1, 'Price is required')
 		.max(99999)
 		.regex(/^\d+(\.\d{1,2})?$/, 'Invalid price format'),
-	salePrice: z.string().max(99999).optional(),
-	stock: z.number().int().min(0, 'Stock cannot be negative').max(999),
-	purchaseNote: z.string().max(200).optional(),
+	sale_price: z.string().max(99999).nullable(),
+	stock_quantity: z.number().int().min(0, 'Stock cannot be negative').max(999),
+	purchase_note: z.string().max(200).optional(),
 	visible: z.boolean(),
 	purchasable: z.boolean(),
-	reviews: z.boolean(),
+	reviews_allowed: z.boolean(),
 	featured: z.boolean(),
 	categories: z.array(z.number()).min(1, 'At least one category is required'),
 })
 
-export default function Create({ categories }: { categories: any[] }) {
+export default function Create({ categories }: { categories: Category[] }) {
 	const router = useRouter()
 	const [activeTab, setActiveTab] = useState('edit')
 	const [activeIndex, setActiveIndex] = useState(0)
@@ -131,12 +131,12 @@ export default function Create({ categories }: { categories: any[] }) {
 			description: '',
 			images: [''],
 			price: '0.00',
-			salePrice: '',
-			stock: 0,
-			purchaseNote: '',
+			sale_price: null,
+			stock_quantity: 0,
+			purchase_note: '',
 			visible: true,
 			purchasable: true,
-			reviews: true,
+			reviews_allowed: true,
 			featured: false,
 			categories: [],
 		},
@@ -165,9 +165,9 @@ export default function Create({ categories }: { categories: any[] }) {
 		}
 	}
 
-	const discount = form.watch('salePrice')
+	const discount = form.watch('sale_price')
 		? Math.round(
-				((Number(form.watch('price')) - Number(form.watch('salePrice'))) /
+				((Number(form.watch('price')) - Number(form.watch('sale_price'))) /
 					Number(form.watch('price'))) *
 					100
 		  )
@@ -184,7 +184,33 @@ export default function Create({ categories }: { categories: any[] }) {
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		const productData = {
 			...data,
-			images: data.images.map((url: string) => ({ url, alt: data.slug })),
+			images: data.images.map((url: string) => ({
+				id: 0,
+				alt: data.slug,
+				src: [url],
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				productsId: 0,
+			})),
+			categories: data.categories.map((id: number) => {
+				const category = categories.find(c => c.id === id)
+				return {
+					id: category?.id || 0,
+					name: category?.name || '',
+					slug: category?.slug || '',
+					createdAt: category?.createdAt || new Date(),
+					updatedAt: category?.updatedAt || new Date(),
+				}
+			}),
+			id: 0,
+			tags: [],
+			specifications: [],
+			reviews: [],
+			orders: [],
+			wishlist: [],
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			purchase_note: data.purchase_note || null,
 		}
 
 		await createProduct(productData)
@@ -247,7 +273,7 @@ export default function Create({ categories }: { categories: any[] }) {
 																<CommandList>
 																	<CommandEmpty>No categories found.</CommandEmpty>
 																	<CommandGroup>
-																		{categories.map((category: any) => (
+																		{categories.map(category => (
 																			<CommandItem
 																				key={category.id}
 																				onSelect={() => {
@@ -275,9 +301,7 @@ export default function Create({ categories }: { categories: any[] }) {
 													</Popover>
 													<div className="flex flex-wrap gap-2 mt-2">
 														{field.value.map((category_id: number, index: number) => {
-															const category = categories.find(
-																(c: any) => c.id === category_id
-															)
+															const category = categories.find(c => c.id === category_id)
 															return (
 																<Button
 																	key={category_id}
@@ -428,7 +452,13 @@ export default function Create({ categories }: { categories: any[] }) {
 													<FormItem>
 														<FormLabel>Price</FormLabel>
 														<FormControl>
-															<Input {...field} type="number" step="0.01" max={99999} />
+															<Input
+																{...field}
+																type="number"
+																step="0.01"
+																max={99999}
+																value={field.value ?? ''}
+															/>
 														</FormControl>
 														<FormMessage />
 													</FormItem>
@@ -437,12 +467,18 @@ export default function Create({ categories }: { categories: any[] }) {
 
 											<FormField
 												control={form.control}
-												name="salePrice"
+												name="sale_price"
 												render={({ field }) => (
 													<FormItem>
 														<FormLabel>Sale Price</FormLabel>
 														<FormControl>
-															<Input {...field} type="number" step="0.01" max={99999} />
+															<Input
+																{...field}
+																type="number"
+																step="0.01"
+																max={99999}
+																value={field.value ?? ''}
+															/>
 														</FormControl>
 														<FormMessage />
 													</FormItem>
@@ -452,7 +488,7 @@ export default function Create({ categories }: { categories: any[] }) {
 
 										<FormField
 											control={form.control}
-											name="stock"
+											name="stock_quantity"
 											render={({ field }) => (
 												<FormItem>
 													<FormLabel>Stock</FormLabel>
@@ -471,7 +507,7 @@ export default function Create({ categories }: { categories: any[] }) {
 
 										<FormField
 											control={form.control}
-											name="purchaseNote"
+											name="purchase_note"
 											render={({ field }) => (
 												<FormItem>
 													<FormLabel>Purchase Note</FormLabel>
@@ -524,7 +560,7 @@ export default function Create({ categories }: { categories: any[] }) {
 										/>
 										<FormField
 											control={form.control}
-											name="reviews"
+											name="reviews_allowed"
 											render={({ field }) => (
 												<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
 													<div className="space-y-0.5">
@@ -599,12 +635,12 @@ export default function Create({ categories }: { categories: any[] }) {
 							<div>
 								<Carousel setApi={setApi} className="w-full">
 									<CarouselContent>
-										{flattenedImages.map((image: any, index: number) => (
-											<CarouselItem key={index} className="flex justify-center">
+										{flattenedImages.map((image, i) => (
+											<CarouselItem key={i} className="flex justify-center">
 												<div className="relative aspect-square w-full max-w-[300px] md:max-w-full">
 													<img
 														src={image.src}
-														alt={image.index + 1}
+														alt={image.alt}
 														className="object-contain h-full w-full flex items-center justify-center text-xl"
 													/>
 												</div>
@@ -613,18 +649,18 @@ export default function Create({ categories }: { categories: any[] }) {
 									</CarouselContent>
 									<ScrollArea className="w-full whitespace-nowrap rounded-md border mt-4">
 										<div className="flex max-w-sm space-x-2 p-2">
-											{flattenedImages.map((image: any, index: number) => (
+											{flattenedImages.map((image, i) => (
 												<button
-													key={index}
-													onClick={() => scrollTo(index)}
+													key={i}
+													onClick={() => scrollTo(i)}
 													className={`relative flex-shrink-0 overflow-hidden rounded-md ${
-														index === activeIndex ? 'ring-2 ring-primary' : ''
+														i === activeIndex ? 'ring-2 ring-primary' : ''
 													}`}
 												>
 													<div className="relative size-16 sm:size-20">
 														<img
 															src={image.src}
-															alt={image.index + 1}
+															alt={image.alt}
 															className="object-cover h-full w-full flex items-center justify-center text-xl"
 														/>
 													</div>
@@ -658,10 +694,10 @@ export default function Create({ categories }: { categories: any[] }) {
 										{discount > 0 && (
 											<Badge className="mb-2 bg-red-600">{discount}% OFF</Badge>
 										)}
-										{form.watch('salePrice') ? (
+										{form.watch('sale_price') ? (
 											<div>
 												<span className="text-red-700 mr-2">
-													{formatCurrency(Number(form.watch('salePrice')))}
+													{formatCurrency(Number(form.watch('sale_price')))}
 												</span>
 												<span className="text-gray-500 line-through text-lg">
 													{formatCurrency(Number(form.watch('price')))}
@@ -672,28 +708,28 @@ export default function Create({ categories }: { categories: any[] }) {
 										)}
 									</div>
 									<div className="mb-4">
-										{form.watch('stock') === 0 ? (
+										{form.watch('stock_quantity') === 0 ? (
 											<div className="text-gray-500 flex items-center">
 												<CircleX className="mr-1 p-1" />
 												Currently unavailable
 											</div>
-										) : form.watch('stock') < 6 ? (
+										) : form.watch('stock_quantity') < 6 ? (
 											<div className="text-orange-600 flex items-center">
 												<CircleCheck className="mr-1 p-1" />
-												{form.watch('stock')} in stock
+												{form.watch('stock_quantity')} in stock
 											</div>
 										) : (
 											<div className="text-green-600 flex items-center">
 												<CircleCheck className="mr-1 p-1" />
-												{form.watch('stock')} In stock
+												{form.watch('stock_quantity')} In stock
 											</div>
 										)}
 									</div>
 								</div>
 								<div className="flex flex-col gap-4 mt-6">
-									{form.watch('purchaseNote') && (
+									{form.watch('purchase_note') && (
 										<p className="text-gray-600 dark:text-gray-400 text-sm mt-4">
-											{form.watch('purchaseNote')}
+											{form.watch('purchase_note')}
 										</p>
 									)}
 									<div>
@@ -736,7 +772,7 @@ export default function Create({ categories }: { categories: any[] }) {
 								</AccordionContent>
 							</AccordionItem>
 						</Accordion>
-						{form.watch('reviews') ? (
+						{form.watch('reviews_allowed') ? (
 							<Accordion
 								type="single"
 								defaultValue="reviews"

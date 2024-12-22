@@ -27,7 +27,7 @@ export default async function CreatePage({
 	}
 	return (
 		<div className="min-h-dvh dark:bg-primary-black bg-primary-white">
-			<Edit product={product} categories={categories} />
+			<Edit product={product as unknown as Products} categories={categories} />
 		</div>
 	)
 }

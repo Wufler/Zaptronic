@@ -19,8 +19,8 @@ export function CheckoutForm({
 	clientSecret,
 }: {
 	amount: number
-	cartItems: any[]
-	session: any
+	cartItems: CartItem[]
+	session: User
 	clientSecret: string
 }) {
 	const stripe = useStripe()
@@ -68,9 +68,9 @@ export function CheckoutForm({
 			} else {
 				throw new Error('Payment failed')
 			}
-		} catch (error: any) {
+		} catch (error) {
 			console.error('Payment error:', error)
-			toast.error(error.message || 'Payment failed. Please try again.')
+			toast.error('Payment failed. Please try again.')
 		} finally {
 			setLoading(false)
 		}

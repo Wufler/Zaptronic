@@ -10,8 +10,8 @@ import { fetchProducts } from '@/actions/products/productsData'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 
-export default async function Component() {
-	const products = await fetchProducts(false)
+export default async function Home() {
+	const products = (await fetchProducts(false)) as unknown as Products[]
 	const featured = products[0]
 	const discount = discountPercentage(featured)
 	const session = await auth.api.getSession({
@@ -98,7 +98,11 @@ export default async function Component() {
 
 			<section id="products" className="pt-12 pb-16 px-4 md:px-6 lg:px-8 bg-muted">
 				<div className="max-w-6xl mx-auto">
-					<HomeProducts products={products} user={session} wishes={wishes} />
+					<HomeProducts
+						products={products}
+						user={session as unknown as User}
+						wishes={wishes as unknown as Wishlist[]}
+					/>
 				</div>
 			</section>
 		</main>

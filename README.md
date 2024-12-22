@@ -49,3 +49,25 @@ pnpm prisma
 ```bash
 pnpm dev
 ```
+
+### Todo
+
+- [x] Homepage
+- [x] Prisma
+- [x] Better Auth
+- [x] Stripe
+- [x] Products
+- [x] Login
+- [x] Orders
+- [x] Wishlist
+- [x] Settings
+- [x] Cart
+- [x] Admin
+- [x] Reviews
+- [ ] Featured Products
+- [ ] Search
+- [ ] Params
+- [ ] Pagination
+- [ ] Billing Information
+- [ ] Integrate Stripe Products
+- [ ] Remove ability to review and purchase disallowed products

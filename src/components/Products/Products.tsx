@@ -20,9 +20,9 @@ export default function Products({
 	user,
 	wishes,
 }: {
-	products: any
-	user: any
-	wishes: any
+	products: Products[]
+	user: User
+	wishes: Wishlist[]
 }) {
 	noStore()
 	const [selectedCategory, setSelectedCategory] = useState<string>('')
@@ -36,9 +36,7 @@ export default function Products({
 
 	const filteredProducts = selectedCategory
 		? products?.filter((product: Products) =>
-				product?.categories.some(
-					(category: any) => category?.slug === selectedCategory
-				)
+				product?.categories.some(category => category?.slug === selectedCategory)
 		  )
 		: products
 
@@ -62,7 +60,7 @@ export default function Products({
 				>
 					All
 				</Button>
-				{uniqueCategories.map((product: any) => (
+				{uniqueCategories.map(product => (
 					<Button
 						key={product.id}
 						onClick={() => {
@@ -119,8 +117,8 @@ export function ProductCard({
 	wishes,
 }: {
 	product: Products
-	user?: any
-	wishes: any
+	user?: User
+	wishes: Wishlist[]
 }) {
 	const [isAddingToCart, setIsAddingToCart] = useState(false)
 	const [isInCart, setIsInCart] = useState(false)
@@ -129,13 +127,15 @@ export function ProductCard({
 	const [isInWishlist, setIsInWishlist] = useState(false)
 	const discount = discountPercentage(product)
 	const averageRating = calculateAverage(
-		product.reviews.map((review: any) => review.rating)
+		product.reviews.map(review => review.rating)
 	)
 	const router = useRouter()
 
 	useEffect(() => {
 		const cart = JSON.parse(localStorage.getItem('cart') || '[]')
-		setIsInCart(cart.some((item: any) => item.id === product.id))
+		setIsInCart(
+			cart.some((item: { id: string | number }) => item.id === product.id)
+		)
 	}, [product])
 
 	async function handleAddToCart() {
@@ -143,7 +143,7 @@ export function ProductCard({
 		try {
 			const cart = JSON.parse(localStorage.getItem('cart') || '[]')
 			const existingItemIndex = cart.findIndex(
-				(item: any) => item.id === product.id
+				(item: { id: string | number }) => item.id === product.id
 			)
 
 			if (existingItemIndex !== -1) {
@@ -197,14 +197,14 @@ export function ProductCard({
 	async function handleWish() {
 		setIsWishing(true)
 		try {
-			const wishlistItem = wishes.find(
-				(item: any) => item.productsId === product.id
+			const wishlistItem = wishes?.find(
+				item => item.productsId === String(product.id)
 			)
 			if (wishlistItem) {
 				await deleteWish(wishlistItem.id)
 				setIsInWishlist(false)
 			} else {
-				await createWish(user?.user.id, product)
+				await createWish(user?.user?.id as string, product.id.toString())
 				setIsInWishlist(true)
 			}
 		} catch (error) {

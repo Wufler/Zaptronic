@@ -81,7 +81,12 @@ export default function Categories({
 			await Promise.all(
 				data.categories.map(async category => {
 					const categoryId = category.id ?? 0
-					await editCategory({ ...category, id: categoryId })
+					await editCategory({
+						...category,
+						id: categoryId,
+						createdAt: new Date(),
+						updatedAt: new Date(),
+					})
 				})
 			)
 			toast.success('Categories updated successfully')
@@ -106,7 +111,12 @@ export default function Categories({
 	async function onCreateCategory(data: Omit<Category, 'id'>) {
 		setIsLoading(true)
 		try {
-			const newCategory = await createCategory(data)
+			const newCategory = await createCategory({
+				...data,
+				id: 0,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			})
 			toast.success('Category created successfully')
 			setCategories(prevCategories => [...prevCategories, newCategory])
 			setShowNewCategoryForm(false)

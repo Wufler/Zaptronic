@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { cancelOrder } from '@/actions/orders/ordersData'
 
-export default function Orders({ orders }: { orders: any }) {
+export default function Orders({ orders }: { orders: Order[] }) {
 	async function handleCancel(id: number) {
 		await cancelOrder(id)
 	}
@@ -60,7 +60,7 @@ export default function Orders({ orders }: { orders: any }) {
 						</Button>
 					</Card>
 				) : (
-					orders.map((order: any) => (
+					orders.map(order => (
 						<Card key={order.orderId} className="mb-4 shadow-lg">
 							<CardHeader className="bg-gray-100 dark:bg-gray-900 py-4">
 								<div className="flex items-center justify-between">
@@ -103,7 +103,7 @@ export default function Orders({ orders }: { orders: any }) {
 										</AccordionTrigger>
 										<AccordionContent>
 											<div className="px-6 py-2 space-y-6">
-												{order.products.map((product: any) => (
+												{order.products.map(product => (
 													<div
 														key={product.id}
 														className="flex sm:items-center sm:flex-row flex-col sm:space-x-4"
@@ -164,7 +164,7 @@ export default function Orders({ orders }: { orders: any }) {
 																	<AlertDialogCancel>Nevermind...</AlertDialogCancel>
 																	<AlertDialogAction asChild>
 																		<Button
-																			onClick={() => handleCancel(order.orderId)}
+																			onClick={() => handleCancel(Number(order.orderId))}
 																			variant="destructive"
 																		>
 																			Confirm

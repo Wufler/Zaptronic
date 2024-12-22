@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { KeyIcon, SettingsIcon, LockKeyhole } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -17,17 +17,19 @@ import {
 } from '@/components/ui/dialog'
 import Loading from '@/components/Loading'
 import Link from 'next/link'
-import { updateUser } from '@/actions/admin/userData'
 import { authClient } from '@/lib/auth-client'
-export default function Settings({
-	user,
-	initialName = user?.user?.name,
-	initialPicture = user?.user?.image,
-}: any) {
+
+export default function Settings() {
+	const { data: session } = authClient.useSession()
 	const [isLoading, setIsLoading] = useState(false)
-	const [name, setName] = useState(initialName)
-	const [picture, setPicture] = useState(initialPicture)
+	const [name, setName] = useState('')
+	const [picture, setPicture] = useState('')
 	const [isOpen, setIsOpen] = useState(false)
+
+	useEffect(() => {
+		setName(session?.user?.name || '')
+		setPicture(session?.user?.image || '')
+	}, [session])
 
 	const handleRegister = async () => {
 		setIsLoading(true)
@@ -45,7 +47,7 @@ export default function Settings({
 		e.preventDefault()
 		setIsLoading(true)
 		try {
-			await updateUser(user?.user?.id, { name, image: picture })
+			await authClient.updateUser({ image: picture, name: name })
 			toast.success('Profile updated successfully')
 			setIsOpen(false)
 		} catch (error) {
@@ -60,7 +62,7 @@ export default function Settings({
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
 				<Button variant="outline">
-					<SettingsIcon className="mr-2 h-4 w-4" />
+					<SettingsIcon className="size-4" />
 					Account Settings
 				</Button>
 			</DialogTrigger>
@@ -81,7 +83,7 @@ export default function Settings({
 					<div className="space-y-1">
 						<p className="text-sm font-medium max-w-72 truncate">{name}</p>
 						<p className="text-sm text-muted-foreground max-w-72 truncate">
-							{user?.user?.email}
+							{session?.user?.email}
 						</p>
 					</div>
 				</div>
@@ -95,16 +97,16 @@ export default function Settings({
 					{isLoading ? (
 						<Loading size={16} />
 					) : (
-						<div className="flex items-center">
-							<KeyIcon className="mr-2 size-4" />
-							<p>Register new Passkey</p>
-						</div>
+						<>
+							<KeyIcon className="size-4" />
+							Register new Passkey
+						</>
 					)}
 				</Button>
-				{user?.user?.role === 'admin' && (
+				{session?.user?.role === 'admin' && (
 					<Button size="sm" asChild>
 						<Link href="/admin">
-							<LockKeyhole className="mr-2 size-4" />
+							<LockKeyhole className="size-4" />
 							Admin dashboard
 						</Link>
 					</Button>

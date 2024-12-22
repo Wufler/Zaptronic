@@ -42,7 +42,7 @@ import { formatCurrency } from '@/lib/formatter'
 import { discountPercentage } from '@/lib/formatter'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { format } from 'date-fns'
+import { format, formatISO } from 'date-fns'
 import { useRouter } from 'next/navigation'
 import Loading from '@/components/Loading'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
@@ -55,9 +55,9 @@ export default function Product({
 	user,
 	wishes,
 }: {
-	product: any
-	user: any
-	wishes: any
+	product: Products
+	user: User
+	wishes: Wishlist[]
 }) {
 	const [isAddingToCart, setIsAddingToCart] = useState(false)
 	const [isPurchasing, setIsPurchasing] = useState(false)
@@ -89,18 +89,22 @@ export default function Product({
 	)
 
 	const flattenedImages =
-		product.images?.flatMap((image: any, i: number) =>
-			image.src.map((src: string, j: number) => ({
+		product.images?.flatMap(image =>
+			image.src.map((src, j) => ({
 				src,
 				alt: image.alt,
-				index: i * image.src.length + j,
+				index: j,
 			}))
 		) || []
 
 	useEffect(() => {
 		const cart = JSON.parse(localStorage.getItem('cart') || '[]')
-		setIsInCart(cart.some((item: any) => item.id === product.id))
-		setIsInWishlist(wishes.some((wish: any) => wish.productsId === product.id))
+		setIsInCart(
+			cart.some((item: { id: string }) => item.id === product.id.toString())
+		)
+		setIsInWishlist(
+			wishes.some(wish => wish.productsId === product.id.toString())
+		)
 	}, [product, wishes])
 
 	if (!product) {
@@ -122,8 +126,8 @@ export default function Product({
 		setIsAddingToCart(true)
 		try {
 			const cart = JSON.parse(localStorage.getItem('cart') || '[]')
-			const existingItemIndex = cart.findIndex(
-				(item: any) => item.id === product.id
+			const existingItemIndex: number = cart.findIndex(
+				(item: { id: string }) => item.id === product.id.toString()
 			)
 
 			if (existingItemIndex !== -1) {
@@ -178,13 +182,13 @@ export default function Product({
 		setIsWishing(true)
 		try {
 			const wishlistItem = wishes.find(
-				(item: any) => item.productsId === product.id
+				item => item.productsId === product.id.toString()
 			)
 			if (wishlistItem) {
-				await deleteWish(wishlistItem.id)
+				await deleteWish(Number(wishlistItem.id))
 				setIsInWishlist(false)
 			} else {
-				await createWish(user?.user.id, product)
+				await createWish(user?.user.id, product.id.toString())
 				setIsInWishlist(true)
 			}
 		} catch (error) {
@@ -216,7 +220,7 @@ export default function Product({
 	}
 
 	const averageRating = calculateAverage(
-		product.reviews?.map((review: any) => review.rating) || []
+		product.reviews?.map(review => review.rating) || []
 	)
 
 	return (
@@ -258,15 +262,15 @@ export default function Product({
 				<div>
 					<Carousel setApi={setApi} className="w-full">
 						<CarouselContent>
-							{flattenedImages.map((image: any, index: number) => (
-								<CarouselItem key={index} className="flex justify-center">
+							{flattenedImages.map((image, i) => (
+								<CarouselItem key={i} className="flex justify-center">
 									<div className="relative aspect-square w-full max-w-[300px] md:max-w-full">
 										<Image
 											src={image.src}
 											alt={image.alt}
 											fill
 											className="object-contain"
-											priority={index === 0}
+											priority={i === 0}
 										/>
 									</div>
 								</CarouselItem>
@@ -274,12 +278,12 @@ export default function Product({
 						</CarouselContent>
 						<ScrollArea className="w-full whitespace-nowrap rounded-md mt-4">
 							<div className="flex max-w-sm space-x-2 p-2">
-								{flattenedImages.map((image: any, index: number) => (
+								{flattenedImages.map((image, i) => (
 									<button
-										key={index}
-										onClick={() => scrollTo(index)}
+										key={i}
+										onClick={() => scrollTo(i)}
 										className={`relative flex-shrink-0 overflow-hidden rounded-md ${
-											index === activeIndex ? 'ring-2 ring-primary' : ''
+											i === activeIndex ? 'ring-2 ring-primary' : ''
 										}`}
 									>
 										<div className="relative size-16 sm:size-20">
@@ -489,7 +493,7 @@ export default function Product({
 
 							<Carousel className="w-full">
 								<CarouselContent>
-									{product.reviews?.slice(0, 5).map((review: any) => (
+									{product.reviews?.slice(0, 5).map(review => (
 										<CarouselItem
 											key={review.id}
 											className="pl-4 sm:basis-1/2 lg:basis-1/3"
@@ -525,8 +529,11 @@ export default function Product({
 														</div>
 														<div>
 															<time
-																title={new Date(review.createdAt).toLocaleString()}
-																dateTime={new Date(review.createdAt).toISOString()}
+																title={format(
+																	new Date(review.createdAt),
+																	'yyyy-MM-dd HH:mm:ss'
+																)}
+																dateTime={formatISO(new Date(review.createdAt))}
 																className="text-xs"
 															>
 																{format(review.createdAt, 'dd.MM.yyyy')}

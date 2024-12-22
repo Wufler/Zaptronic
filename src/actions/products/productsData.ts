@@ -13,7 +13,11 @@ export async function fetchProducts(isAdmin?: boolean, id?: number) {
                 categories: true,
                 tags: true,
                 images: true,
-                reviews: true,
+                reviews: {
+                    include: {
+                        user: true,
+                    }
+                },
                 orders: true,
                 wishlist: true,
             }
@@ -31,7 +35,11 @@ export async function fetchProducts(isAdmin?: boolean, id?: number) {
             categories: true,
             tags: true,
             images: true,
-            reviews: true,
+            reviews: {
+                include: {
+                    user: true,
+                }
+            },
             orders: true,
             wishlist: true,
         },

@@ -13,7 +13,11 @@ export default async function Home() {
 
 	return (
 		<main className="min-h-dvh dark:bg-primary-black bg-primary-white">
-			<Products products={products} user={session} wishes={wishes} />
+			<Products
+				products={products as unknown as Products[]}
+				user={session as unknown as User}
+				wishes={wishes as unknown as Wishlist[]}
+			/>
 		</main>
 	)
 }

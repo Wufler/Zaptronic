@@ -10,7 +10,7 @@ export default async function ProductDetails({
 	params: Promise<{ id: string }>
 }) {
 	const id = (await params).id
-	const product = await fetchProducts(false, Number(id))
+	const product = (await fetchProducts(false, Number(id))) as unknown as Products
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	})
@@ -18,7 +18,11 @@ export default async function ProductDetails({
 
 	return (
 		<div className="dark:bg-primary-black bg-primary-white min-h-dvh">
-			<Product product={product} user={session} wishes={wishes} />
+			<Product
+				product={product as unknown as Products}
+				user={session as unknown as User}
+				wishes={wishes as unknown as Wishlist[]}
+			/>
 		</div>
 	)
 }

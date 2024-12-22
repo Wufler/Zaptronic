@@ -25,19 +25,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { deleteWish } from '@/actions/wishlist/Wishlist'
 
-interface WishlistItem {
-	id: number
-	products: {
-		id: number
-		name: string
-		images: { src: string[]; alt: string }[]
-		price: number
-		stock_quantity: number
-		description: string
-	}
-}
-
-export default function Wishlist({ wishes }: any) {
+export default function Wishlist({ wishes }: { wishes: WishlistItem[] }) {
 	async function handleDelete(id: number) {
 		await deleteWish(id)
 	}
@@ -70,7 +58,7 @@ export default function Wishlist({ wishes }: any) {
 						</Button>
 					</Card>
 				) : (
-					wishes.map((wish: WishlistItem) => (
+					wishes.map(wish => (
 						<Card key={wish.products.id} className="mb-4 shadow-lg overflow-hidden">
 							<CardContent className="p-0">
 								<Accordion type="single" collapsible>
@@ -119,9 +107,6 @@ export default function Wishlist({ wishes }: any) {
 													<div className="flex-1 min-w-0">
 														<p className="text-base font-semibold text-gray-900 dark:text-white">
 															{wish.products.name}
-														</p>
-														<p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-															{wish.products.description}
 														</p>
 														<dl className="mt-2 text-sm text-gray-500 dark:text-gray-400 space-y-1">
 															<div className="flex justify-between">

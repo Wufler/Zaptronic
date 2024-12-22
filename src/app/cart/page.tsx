@@ -14,7 +14,7 @@ export default async function CartPage() {
 
 	return (
 		<div className="bg-primary-white dark:bg-primary-black">
-			<Cart user={session} />
+			<Cart user={session as unknown as User} />
 		</div>
 	)
 }

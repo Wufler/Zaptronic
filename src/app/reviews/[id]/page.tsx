@@ -11,7 +11,7 @@ export default async function ReviewPage({
 
 	return (
 		<div className="dark:bg-primary-black bg-primary-white">
-			<Reviews product={reviews} />
+			<Reviews product={reviews as unknown as Products} />
 		</div>
 	)
 }

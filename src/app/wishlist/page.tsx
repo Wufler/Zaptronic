@@ -12,7 +12,7 @@ export default async function page() {
 
 	return (
 		<div className="dark:bg-primary-black bg-primary-white">
-			<Wishlist wishes={wishes} />
+			<Wishlist wishes={wishes as unknown as WishlistItem[]} />
 		</div>
 	)
 }

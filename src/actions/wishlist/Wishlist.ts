@@ -10,22 +10,11 @@ export async function fetchWishlist(id: string) {
         orderBy: {
             createdAt: 'desc',
         },
-        select: {
-            id: true,
-            productsId: true,
-            createdAt: true,
-            updatedAt: true,
+        include: {
+            user: true,
             products: {
-                select: {
-                    id: true,
-                    name: true,
+                include: {
                     images: true,
-                    reviews: true,
-                    categories: true,
-                    price: true,
-                    sale_price: true,
-                    purchase_note: true,
-                    stock_quantity: true,
                 }
             }
         },
@@ -41,11 +30,11 @@ export async function deleteWish(id: number) {
     revalidatePath('/')
 }
 
-export async function createWish(id: string, data: any) {
+export async function createWish(id: string, data: string) {
     await prisma.wishlist.create({
         data: {
             userId: id,
-            productsId: data.id,
+            productsId: Number(data),
         },
     })
     revalidatePath('/')

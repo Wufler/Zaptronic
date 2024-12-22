@@ -103,9 +103,9 @@ const FormSchema = z.object({
 		.min(1, 'Price is required')
 		.max(99999)
 		.regex(/^\d+(\.\d{1,2})?$/, 'Invalid price format'),
-	salePrice: z.string().max(99999).optional(),
+	sale_price: z.string().max(99999).optional(),
 	stock: z.number().int().min(0, 'Stock cannot be negative').max(999),
-	purchaseNote: z.string().max(200).optional(),
+	purchase_note: z.string().max(200).optional(),
 	visible: z.boolean(),
 	purchasable: z.boolean(),
 	reviews: z.boolean(),
@@ -117,8 +117,8 @@ export default function Edit({
 	product,
 	categories,
 }: {
-	product: any
-	categories: any[]
+	product: Products
+	categories: Category[]
 }) {
 	const router = useRouter()
 	const [activeTab, setActiveTab] = useState('edit')
@@ -145,21 +145,20 @@ export default function Edit({
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 		defaultValues: {
-			name: product.name,
-			slug: product.slug,
-			description: product.description,
-			images: product.images[0].src,
-			price: product.price,
-			salePrice: product.sale_price,
-			stock: product.stock_quantity,
-			purchaseNote: product.purchase_note,
-			visible: product.visible,
-			purchasable: product.purchasable,
-			reviews: product.reviews_allowed,
-			featured: product.featured,
-			categories: product.categories.map(
-				(category: { id: number }) => category.id
-			),
+			name: product.name || '',
+			slug: product.slug || '',
+			description: product.description || '',
+			images: product.images.flatMap(image => image.src) || [''],
+			price: product.price || '',
+			sale_price: product.sale_price || '',
+			stock: product.stock_quantity || 0,
+			purchase_note: product.purchase_note || '',
+			visible: product.visible || false,
+			purchasable: product.purchasable || false,
+			reviews: product.reviews_allowed || false,
+			featured: product.featured || false,
+			categories:
+				product.categories.map((category: { id: number }) => category.id) || [],
 		},
 	})
 
@@ -186,9 +185,9 @@ export default function Edit({
 		}
 	}
 
-	const discount = form.watch('salePrice')
+	const discount = form.watch('sale_price')
 		? Math.round(
-				((Number(form.watch('price')) - Number(form.watch('salePrice'))) /
+				((Number(form.watch('price')) - Number(form.watch('sale_price'))) /
 					Number(form.watch('price'))) *
 					100
 		  )
@@ -203,9 +202,24 @@ export default function Edit({
 	}, [form])
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		const productData = {
+		const productData: Products = {
+			...product,
 			...data,
-			images: data.images.map((url: string) => ({ url })),
+			images: data.images.map((url: string, index: number) => ({
+				id: product.images[index]?.id || 0,
+				alt: product.images[index]?.alt || '',
+				src: [url],
+				createdAt: product.images[index]?.createdAt || new Date(),
+				updatedAt: new Date(),
+				productsId: product.id,
+			})),
+			categories: data.categories.map((id: number) => {
+				const category = categories.find(c => c.id === id)
+				return category
+					? { ...category }
+					: { id, name: '', slug: '', createdAt: new Date(), updatedAt: new Date() }
+			}),
+			reviews: product.reviews,
 		}
 		await editProduct(productData, product.id, product.images[0].id)
 		router.push(`/products/${product.id}`)
@@ -278,7 +292,7 @@ export default function Edit({
 																<CommandList>
 																	<CommandEmpty>No categories found.</CommandEmpty>
 																	<CommandGroup>
-																		{categories.map((category: any) => (
+																		{categories.map(category => (
 																			<CommandItem
 																				key={category.id}
 																				onSelect={() => {
@@ -306,9 +320,7 @@ export default function Edit({
 													</Popover>
 													<div className="flex flex-wrap gap-2 mt-2">
 														{field.value.map((category_id: number, index: number) => {
-															const category = categories.find(
-																(c: any) => c.id === category_id
-															)
+															const category = categories.find(c => c.id === category_id)
 															return (
 																<Button
 																	key={category_id}
@@ -468,7 +480,7 @@ export default function Edit({
 
 											<FormField
 												control={form.control}
-												name="salePrice"
+												name="sale_price"
 												render={({ field }) => (
 													<FormItem>
 														<FormLabel>Sale Price</FormLabel>
@@ -502,7 +514,7 @@ export default function Edit({
 
 										<FormField
 											control={form.control}
-											name="purchaseNote"
+											name="purchase_note"
 											render={({ field }) => (
 												<FormItem>
 													<FormLabel>Purchase Note</FormLabel>
@@ -655,12 +667,12 @@ export default function Edit({
 							<div>
 								<Carousel setApi={setApi} className="w-full">
 									<CarouselContent>
-										{flattenedImages.map((image: any, index: number) => (
-											<CarouselItem key={index} className="flex justify-center">
+										{flattenedImages.map((image, i) => (
+											<CarouselItem key={i} className="flex justify-center">
 												<div className="relative aspect-square w-full max-w-[300px] md:max-w-full">
 													<img
 														src={image.src}
-														alt={image.index + 1}
+														alt={image.alt}
 														className="object-contain h-full w-full flex items-center justify-center text-xl"
 													/>
 												</div>
@@ -669,18 +681,18 @@ export default function Edit({
 									</CarouselContent>
 									<ScrollArea className="w-full whitespace-nowrap rounded-md border mt-4">
 										<div className="flex max-w-sm space-x-2 p-2">
-											{flattenedImages.map((image: any, index: number) => (
+											{flattenedImages.map((image, i) => (
 												<button
-													key={index}
-													onClick={() => scrollTo(index)}
+													key={i}
+													onClick={() => scrollTo(i)}
 													className={`relative flex-shrink-0 overflow-hidden rounded-md ${
-														index === activeIndex ? 'ring-2 ring-primary' : ''
+														i === activeIndex ? 'ring-2 ring-primary' : ''
 													}`}
 												>
 													<div className="relative size-16 sm:size-20">
 														<img
 															src={image.src}
-															alt={image.index + 1}
+															alt={image.alt}
 															className="object-cover h-full w-full flex items-center justify-center text-xl"
 														/>
 													</div>
@@ -714,10 +726,10 @@ export default function Edit({
 										{discount > 0 && (
 											<Badge className="mb-2 bg-red-600">{discount}% OFF</Badge>
 										)}
-										{form.watch('salePrice') ? (
+										{form.watch('sale_price') ? (
 											<div>
 												<span className="text-red-700 mr-2">
-													{formatCurrency(Number(form.watch('salePrice')))}
+													{formatCurrency(Number(form.watch('sale_price')))}
 												</span>
 												<span className="text-gray-500 line-through text-lg">
 													{formatCurrency(Number(form.watch('price')))}
@@ -748,9 +760,9 @@ export default function Edit({
 								</div>
 
 								<div className="flex flex-col gap-4 mt-6">
-									{form.watch('purchaseNote') && (
+									{form.watch('purchase_note') && (
 										<p className="text-gray-600 dark:text-gray-400 text-sm mt-4">
-											{form.watch('purchaseNote')}
+											{form.watch('purchase_note')}
 										</p>
 									)}
 									<div>

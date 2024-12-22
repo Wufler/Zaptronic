@@ -44,7 +44,7 @@ const formSchema = z.object({
 		.max(1000, 'Description must be 1000 characters or less'),
 })
 
-export default function Review({ product, user }: { product: any; user: any }) {
+export default function Review({ product }: { product: Products }) {
 	const [isReviewing, setIsReviewing] = useState(false)
 	const router = useRouter()
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -63,7 +63,7 @@ export default function Review({ product, user }: { product: any; user: any }) {
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		try {
 			setIsReviewing(true)
-			await createReview(user?.user.id, product.id, values)
+			await createReview(product.id, values)
 			toast.success(
 				<div className="flex items-center gap-2">
 					<CheckCircle2 className="size-5" />
@@ -94,7 +94,7 @@ export default function Review({ product, user }: { product: any; user: any }) {
 	}
 	const discount = discountPercentage(product)
 	const averageRating = calculateAverage(
-		product.reviews.map((review: any) => review.rating)
+		product.reviews.map(review => review.rating)
 	)
 
 	return (

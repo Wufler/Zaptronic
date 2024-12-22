@@ -4,12 +4,12 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { discountPercentage, formatCurrency } from '@/lib/formatter'
-import { format } from 'date-fns'
+import { format, formatISO } from 'date-fns'
 import { CircleCheck, CircleX, Star, User } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 
-export default function Reviews({ product }: any) {
+export default function Reviews({ product }: { product: Products }) {
 	function calculateStars(rating: number, size: number) {
 		return (
 			<div className="flex">
@@ -28,7 +28,7 @@ export default function Reviews({ product }: any) {
 	}
 	const discount = discountPercentage(product)
 	const averageRating = calculateAverage(
-		product.reviews.map((review: any) => review.rating)
+		product.reviews.map(review => review.rating)
 	)
 	return (
 		<div className="container mx-auto px-4 py-8">
@@ -101,7 +101,7 @@ export default function Reviews({ product }: any) {
 				</CardContent>
 			</Card>
 			<div className="flex gap-4 items-center justify-between mb-4"></div>
-			{product.reviews.map((review: any) => (
+			{product.reviews.map(review => (
 				<div key={review.id}>
 					<Card className="h-full my-8">
 						<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -121,8 +121,8 @@ export default function Reviews({ product }: any) {
 								</div>
 								<div>
 									<time
-										title={new Date(review.createdAt).toLocaleString()}
-										dateTime={new Date(review.createdAt).toISOString()}
+										title={format(new Date(review.createdAt), 'yyyy-MM-dd HH:mm:ss')}
+										dateTime={formatISO(new Date(review.createdAt))}
 										className="text-xs"
 									>
 										{format(review.createdAt, 'dd.MM.yyyy')}
