@@ -47,7 +47,7 @@ import { useRouter } from 'next/navigation'
 import Loading from '@/components/Loading'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { createWish, deleteWish } from '@/actions/wishlist/Wishlist'
+import { createWish } from '@/actions/wishlist/Wishlist'
 import { calculateAverage } from '@/actions/averageRating'
 
 export default function Product({
@@ -106,6 +106,10 @@ export default function Product({
 			wishes.some(wish => wish.productsId === product.id.toString())
 		)
 	}, [product, wishes])
+
+	useEffect(() => {
+		setIsInWishlist(wishes.some(wish => Number(wish.productsId) === product.id))
+	}, [wishes, product.id])
 
 	if (!product) {
 		return (
@@ -181,25 +185,16 @@ export default function Product({
 	async function handleWish() {
 		setIsWishing(true)
 		try {
-			const wishlistItem = wishes.find(
-				item => item.productsId === product.id.toString()
-			)
-			if (wishlistItem) {
-				await deleteWish(Number(wishlistItem.id))
-				setIsInWishlist(false)
-			} else {
-				await createWish(user?.user.id, product.id.toString())
-				setIsInWishlist(true)
-			}
+			await createWish(product.id.toString())
+			setIsWishing(false)
 		} catch (error) {
 			toast.error(`Failed to wishlist product: ${error}`)
 			console.error('Error wishing product:', error)
 		} finally {
-			setTimeout(() => {
-				setIsWishing(false)
-			}, 2000)
+			setIsWishing(false)
 		}
 	}
+
 	const discount = discountPercentage(product)
 
 	function calculateStars(rating: number, size: number) {
