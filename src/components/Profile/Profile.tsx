@@ -26,29 +26,38 @@ import { authClient } from '@/lib/auth-client'
 
 export default function Profile({ orders }: { orders: Order[] }) {
 	const { data: session, isPending } = authClient.useSession()
+
 	if (isPending) return <Loader2 className="animate-spin size-10 mx-auto" />
+
+	if (!session?.user) {
+		return null
+	}
+
+	const createdAt = session.user.createdAt
+		? new Date(session.user.createdAt)
+		: new Date()
+
 	return (
 		<Card className="max-w-4xl mx-auto">
 			<CardHeader>
 				<div className="flex items-center space-x-4">
 					<Avatar className="size-20">
-						<AvatarImage src={session?.user?.image || ''} />
+						<AvatarImage src={session.user.image || ''} />
 						<AvatarFallback className="bg-primary text-primary-foreground text-2xl">
-							{session?.user?.name?.charAt(0) ?? ''}
+							{session.user.name?.charAt(0) ?? ''}
 						</AvatarFallback>
 					</Avatar>
 					<div>
 						<CardTitle className="text-2xl font-bold max-w-72 truncate">
-							{session?.user?.name}
+							{session.user.name}
 						</CardTitle>
 						<CardDescription className="max-w-72 truncate">
-							{session?.user?.email}
+							{session.user.email}
 						</CardDescription>
 						<div className="flex items-center mt-2">
 							<CalendarDays className="size-4 mr-2" />
 							<span className="text-sm text-muted-foreground">
-								Customer since{' '}
-								{format(new Date(session?.user?.createdAt || ''), 'MMMM dd, yyyy')}
+								Customer since {format(createdAt, 'MMMM dd, yyyy')}
 							</span>
 						</div>
 					</div>

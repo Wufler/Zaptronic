@@ -97,15 +97,16 @@ export default function Navbar({ user }: { user: User }) {
 	}, [])
 
 	async function userSignOut() {
-		await authClient.signOut({
-			fetchOptions: {
-				onSuccess: () => {
-					router.push('/')
-				},
-			},
-		})
-		router.refresh()
-		toast.success('Successfully signed out.')
+		try {
+			await authClient.signOut()
+			router.push('/login')
+			router.refresh()
+			toast.success('Successfully signed out.')
+		} catch (error) {
+			console.error(error)
+			toast.error('Error signing out')
+			router.push('/login')
+		}
 	}
 
 	const removeFromCart = (productId: number) => {

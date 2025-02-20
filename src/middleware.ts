@@ -3,20 +3,27 @@ import type { Session } from "better-auth/types";
 import { NextResponse, type NextRequest } from "next/server";
 
 export default async function authMiddleware(request: NextRequest) {
-    const { data: session } = await betterFetch<Session>(
-        "/api/auth/get-session",
-        {
-            baseURL: request.nextUrl.origin,
-            headers: {
-                cookie: request.headers.get("cookie") || "",
+    try {
+        const { data: session } = await betterFetch<Session>(
+            "/api/auth/get-session",
+            {
+                baseURL: request.nextUrl.origin,
+                headers: {
+                    cookie: request.headers.get("cookie") || "",
+                },
             },
-        },
-    );
+        );
 
-    if (!session) {
-        return NextResponse.redirect(new URL("/login", request.url));
+        if (!session) {
+            const loginUrl = new URL("/login", request.url);
+            return NextResponse.redirect(loginUrl);
+        }
+        return NextResponse.next();
+    } catch (error) {
+        console.error("Middleware error:", error);
+        const loginUrl = new URL("/login", request.url);
+        return NextResponse.redirect(loginUrl);
     }
-    return NextResponse.next();
 }
 
 export const config = {

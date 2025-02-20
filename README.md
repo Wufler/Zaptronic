@@ -25,8 +25,6 @@ Copy the `env.example` file and rename it to `.env` and set the following variab
   https://www.better-auth.com/docs/installation#set-environment-variables
 - GitHub Provider:
   https://github.com/settings/developers
-  - Discord Provider:
-    https://discord.com/developers/applications
 - Stripe:
   https://dashboard.stripe.com/test/dashboard
 - Nodemailer:

@@ -1,5 +1,4 @@
 'use client'
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { useTransition } from 'react'
 import { toast } from 'sonner'
@@ -7,6 +6,7 @@ import Loading from '@/components/Loading'
 import { authClient } from '@/lib/auth-client'
 import { useRouter } from 'next/navigation'
 import { KeyIcon } from 'lucide-react'
+import Github from '../ui/github'
 export default function Providers() {
 	const [isPending, startTransition] = useTransition()
 	const router = useRouter()
@@ -35,18 +35,6 @@ export default function Providers() {
 		})
 	}
 
-	const handleDiscord = async () => {
-		startTransition(async () => {
-			try {
-				await authClient.signIn.social({ provider: 'discord', callbackURL: '/' })
-				router.refresh()
-			} catch (error) {
-				toast.error(`Discord sign-in failed`)
-				console.error('Discord sign-in failed', error)
-			}
-		})
-	}
-
 	return (
 		<>
 			<div className="relative">
@@ -69,34 +57,9 @@ export default function Providers() {
 					{isPending ? (
 						<Loading size={16} />
 					) : (
-						<Image
-							src={'/github.svg'}
-							alt="GitHub"
-							width={20}
-							height={20}
-							className="size-5 p-[1px] dark:invert"
-						/>
+						<Github className="dark:invert-0 invert" />
 					)}
 					GitHub
-				</Button>
-				<Button
-					variant="outline"
-					className="flex gap-2 w-full"
-					onClick={handleDiscord}
-					disabled={isPending}
-				>
-					{isPending ? (
-						<Loading size={16} />
-					) : (
-						<Image
-							src={'/discord.svg'}
-							alt="Discord"
-							width={20}
-							height={20}
-							className="size-5"
-						/>
-					)}
-					Discord
 				</Button>
 			</div>
 			<Button
