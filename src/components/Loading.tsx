@@ -1,4 +1,5 @@
-import { OneEightyRing } from 'react-svg-spinners'
+import { Loader2 } from 'lucide-react'
+
 interface LoadingProps {
 	text?: string
 	textSize?: string
@@ -14,7 +15,12 @@ export default function Loading(loading: LoadingProps) {
 				loading.fullscreen ? 'min-h-dvh' : ''
 			} ${loading.background ? 'bg-primary-white dark:bg-primary-black' : ''}`}
 		>
-			<OneEightyRing width={loading.size} height={loading.size} color="#4195D1" />
+			<Loader2
+				width={loading.size}
+				height={loading.size}
+				color="#4195D1"
+				className="animate-spin"
+			/>
 			{loading?.text && (
 				<div className={`text-black dark:text-white ${loading?.textSize || ''}`}>
 					<span className="sr-only">{loading?.text}</span>
