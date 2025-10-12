@@ -177,8 +177,21 @@ async function main() {
     })
   }
 
+  const productCategoryMap: { [key: number]: number[] } = {
+    1: [1],
+    2: [2],
+    3: [3],
+    4: [4],
+    5: [2],
+    6: [3],
+    7: [8],
+    8: [10],
+  }
+
   console.log('Seeding products...')
   for (const product of productsData) {
+    const categoryIds = productCategoryMap[product.id] || []
+
     await prisma.products.upsert({
       where: { id: product.id },
       update: {
@@ -194,6 +207,9 @@ async function main() {
         featured: product.featured,
         stock_quantity: product.stock_quantity,
         updatedAt: new Date(product.updatedAt),
+        categories: {
+          set: categoryIds.map(id => ({ id })),
+        },
       },
       create: {
         id: product.id,
@@ -210,6 +226,9 @@ async function main() {
         stock_quantity: product.stock_quantity,
         createdAt: new Date(product.createdAt),
         updatedAt: new Date(product.updatedAt),
+        categories: {
+          connect: categoryIds.map(id => ({ id })),
+        },
       },
     })
   }
