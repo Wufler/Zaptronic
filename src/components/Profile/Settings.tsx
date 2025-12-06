@@ -31,18 +31,6 @@ export default function Settings() {
 		setPicture(session?.user?.image || '')
 	}, [session])
 
-	const handleRegister = async () => {
-		setIsLoading(true)
-		try {
-			await authClient.passkey.addPasskey()
-			toast.success('Passkey registered successfully')
-		} catch (error) {
-			toast.error('Passkey registration failed')
-			console.error('Error registering passkey:', error)
-		} finally {
-			setIsLoading(false)
-		}
-	}
 	const handleSave = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setIsLoading(true)
@@ -87,22 +75,6 @@ export default function Settings() {
 						</p>
 					</div>
 				</div>
-				<Button
-					type="button"
-					variant="outline"
-					className="w-full"
-					onClick={handleRegister}
-					disabled={isLoading}
-				>
-					{isLoading ? (
-						<Loading size={16} />
-					) : (
-						<>
-							<KeyIcon className="size-4" />
-							Register new Passkey
-						</>
-					)}
-				</Button>
 				{session?.user?.role === 'admin' && (
 					<Button size="sm" asChild>
 						<Link href="/admin">

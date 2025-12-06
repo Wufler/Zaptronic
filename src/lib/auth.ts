@@ -1,7 +1,6 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import prisma from "./prisma";
-import { passkey } from "better-auth/plugins/passkey"
 import { magicLink } from "better-auth/plugins";
 import { sendEmail } from "./email";
 
@@ -16,7 +15,6 @@ export const auth = betterAuth({
         },
     },
     plugins: [
-        passkey(),
         magicLink({
             sendMagicLink: async ({ email, url }) => {
                 await sendEmail({

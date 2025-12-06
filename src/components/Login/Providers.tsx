@@ -7,21 +7,10 @@ import { authClient } from '@/lib/auth-client'
 import { useRouter } from 'next/navigation'
 import { KeyIcon } from 'lucide-react'
 import Github from '../ui/github'
+
 export default function Providers() {
 	const [isPending, startTransition] = useTransition()
 	const router = useRouter()
-
-	const handleSignIn = async () => {
-		startTransition(async () => {
-			try {
-				await authClient.signIn.passkey()
-				router.push('/')
-			} catch (error) {
-				toast.error(`Passkey login failed`)
-				console.error('Passkey login failed', error)
-			}
-		})
-	}
 
 	const handleGitHub = async () => {
 		startTransition(async () => {
@@ -62,15 +51,6 @@ export default function Providers() {
 					GitHub
 				</Button>
 			</div>
-			<Button
-				variant="outline"
-				className="flex gap-2 w-full"
-				onClick={handleSignIn}
-				disabled={isPending}
-			>
-				{isPending ? <Loading size={16} /> : <KeyIcon className="size-4" />}
-				Passkey
-			</Button>
 		</>
 	)
 }
