@@ -156,14 +156,14 @@ async function main() {
   ]
 
   const imagesData = [
-    { id: 1, alt: "amd-ryzen-9-9950x-4-3-ghz-80mb-am5-no-cooler-incl-processor-boxed", src: ["https://wolfey.s-ul.eu/6S7dh2rF"], createdAt: "2024-09-04 11:27:37.73", updatedAt: "2024-09-04 11:27:37.73", productsId: 1 },
-    { id: 2, alt: "asus-geforce-rtx-4070-super-prime-oc-12-gb", src: ["https://wolfey.s-ul.eu/cjUQ1C2T", "https://wolfey.s-ul.eu/IgDhdni0"], createdAt: "2024-09-04 11:27:37.73", updatedAt: "2024-09-04 11:27:37.73", productsId: 2 },
-    { id: 3, alt: "kingston-fury-renegade-1tb", src: ["https://wolfey.s-ul.eu/DtcK5kwq", "https://wolfey.s-ul.eu/7esXDwfy", "https://wolfey.s-ul.eu/F1zstXgX"], createdAt: "2024-09-04 11:27:37.73", updatedAt: "2024-09-04 11:27:37.73", productsId: 3 },
-    { id: 4, alt: "deltaco-displayport-hdmi-cable", src: ["https://wolfey.s-ul.eu/zzsjDvdl", "https://wolfey.s-ul.eu/wiqK4dbP"], createdAt: "2024-09-04 11:27:37.73", updatedAt: "2024-09-04 11:27:37.73", productsId: 4 },
-    { id: 5, alt: "asrock-amd-radeon-rx-6750-xt-challenger-pro-12gb-oc", src: ["https://wolfey.s-ul.eu/Ts8l5OlH", "https://wolfey.s-ul.eu/PXqPbra6", "https://wolfey.s-ul.eu/GbJ7UdDZ", "https://wolfey.s-ul.eu/LkaqJc5I"], createdAt: "2024-09-04 11:27:37.73", updatedAt: "2024-11-21 11:35:08.409", productsId: 5 },
-    { id: 6, alt: "kingston-a400-960gb,-sata-iii,-2.5\"---ssd", src: ["https://wolfey.s-ul.eu/gHbdUvKK"], createdAt: "2024-09-04 11:27:37.73", updatedAt: "2024-09-04 11:27:37.73", productsId: 6 },
-    { id: 7, alt: "fractal-design-north---charcoal-black", src: ["https://wolfey.s-ul.eu/QWXETPpz"], createdAt: "2024-09-04 11:27:37.73", updatedAt: "2024-10-29 12:10:46.945", productsId: 7 },
-    { id: 8, alt: "g733-lightspeed-wireless-rgb-gaming-headset", src: ["https://wolfey.s-ul.eu/Sw8UGB10"], createdAt: "2024-09-10 10:33:44.234", updatedAt: "2024-12-17 08:40:49.755", productsId: 8 }
+    { id: 1, alt: "amd-ryzen-9-9950x-4-3-ghz-80mb-am5-no-cooler-incl-processor-boxed", src: ["https://up.wolfey.me/fyUXBOtk"], createdAt: "2024-09-04 11:27:37.73", updatedAt: "2024-09-04 11:27:37.73", productsId: 1 },
+    { id: 2, alt: "asus-geforce-rtx-4070-super-prime-oc-12-gb", src: ["https://up.wolfey.me/GPMxY9SF", "https://up.wolfey.me/bAn2BxNI"], createdAt: "2024-09-04 11:27:37.73", updatedAt: "2024-09-04 11:27:37.73", productsId: 2 },
+    { id: 3, alt: "kingston-fury-renegade-1tb", src: ["https://up.wolfey.me/jZ6tnpB8", "https://up.wolfey.me/9Dxh7CSF", "https://up.wolfey.me/gaFeb_5v"], createdAt: "2024-09-04 11:27:37.73", updatedAt: "2024-09-04 11:27:37.73", productsId: 3 },
+    { id: 4, alt: "deltaco-displayport-hdmi-cable", src: ["https://up.wolfey.me/s3ev7TMQ", "https://up.wolfey.me/jRNJY28m"], createdAt: "2024-09-04 11:27:37.73", updatedAt: "2024-09-04 11:27:37.73", productsId: 4 },
+    { id: 5, alt: "asrock-amd-radeon-rx-6750-xt-challenger-pro-12gb-oc", src: ["https://up.wolfey.me/zeJ5UvUL", "https://up.wolfey.me/n-N33vLq", "https://up.wolfey.me/KlwRq69B", "https://up.wolfey.me/Gexd5pD-"], createdAt: "2024-09-04 11:27:37.73", updatedAt: "2024-11-21 11:35:08.409", productsId: 5 },
+    { id: 6, alt: "kingston-a400-960gb,-sata-iii,-2.5\"---ssd", src: ["https://up.wolfey.me/8CB6OwVw"], createdAt: "2024-09-04 11:27:37.73", updatedAt: "2024-09-04 11:27:37.73", productsId: 6 },
+    { id: 7, alt: "fractal-design-north---charcoal-black", src: ["https://up.wolfey.me/aoNk5ary"], createdAt: "2024-09-04 11:27:37.73", updatedAt: "2024-10-29 12:10:46.945", productsId: 7 },
+    { id: 8, alt: "g733-lightspeed-wireless-rgb-gaming-headset", src: ["https://up.wolfey.me/XBLu3gbY"], createdAt: "2024-09-10 10:33:44.234", updatedAt: "2024-12-17 08:40:49.755", productsId: 8 }
   ]
 
   console.log('Seeding categories...')

@@ -382,17 +382,7 @@ export default function Create({ categories }: { categories: Category[] }) {
 									<CardContent className="space-y-4">
 										<div className="flex gap-1 text-xs text-gray-600 dark:text-gray-400 items-center mb-4">
 											<AlertCircle className="size-4 text-orange-600" />
-											<span>
-												Only upload images from{' '}
-												<Link
-													href={'https://postimages.org/'}
-													target="_blank"
-													className="underline"
-												>
-													postimages.org
-												</Link>{' '}
-												(direct link)
-											</span>
+											<span>Ask your admin to host images for you.</span>
 										</div>
 										{form.watch('images').map((_, index) => (
 											<FormField

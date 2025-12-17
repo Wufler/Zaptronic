@@ -19,10 +19,10 @@ export const metadata: Metadata = {
 		url: 'https://zaptronic.vercel.app',
 		images: [
 			{
-				url: 'https://wolfey.s-ul.eu/KGpeKVd2',
-				width: 1280,
-				height: 720,
-				alt: 'Thumbnail',
+				url: '/cover.png',
+				width: 1920,
+				height: 1080,
+				alt: 'Zaptronic thumbnail',
 			},
 		],
 		locale: 'en_US',
